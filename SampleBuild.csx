@@ -2,8 +2,8 @@
 #load Files.csx
 #r "Microsoft.Build.dll"
 //Usage:
-//scriptcs.exe sample_build.csx --
-//scriptcs.exe sample_build.csx -- /t:Build /c:Debug /b:MyBranch
+//scriptcs.exe SampleBuild.csx
+//scriptcs.exe SampleBuild.csx -- /t:Build /c:Debug /b:MyBranch
 using System.Xml;
 
 //Enable/Disable log (default, true)
@@ -16,6 +16,18 @@ new SampleBuild().RunTarget();
 //This class define your custom build (and MUST inherit from 'Build' class)
 public class SampleBuild : Build
 {
+	//Run before the Target called
+	public SampleBuild()
+	{
+		Clean();
+	}
+	
+	//Always run in the end
+	~SampleBuild()
+	{
+		Clean();
+	}
+	
 	//Define here, variables common to different targets
 	static string ProjectDir = @".\";
 	static string ProjectTestDir = @".\";
@@ -41,7 +53,6 @@ public class SampleBuild : Build
 		Build();
 		CoverageAndTests();
 		Publish();
-		Clean();
 	}
 
 	[Target]
@@ -82,17 +93,5 @@ public class SampleBuild : Build
 		Files.DeleteFilesWithPattern("TestResults", "*.trx");
 		Files.DeleteDirectoriesWithPattern(".", string.Format("{0}_{1}*", GetEnvironnementVariable("USERNAME"), GetEnvironnementVariable("COMPUTERNAME")));
 	}
-	
-	///----------Builtin Methods:
-	//Get command line argument
-	string GetArguments(string prefix, string defaultValue)
-	//Run a command line task!
-	bool RunTask(string command, string arguments, bool continueOnError = false)
-	//Display a string in the console and the log file
-	void DisplayAndLog(string log)
-	//Write a string in the log
-	void Log(string log)
-	//Get the value of an environnement variable
-	string GetEnvironnementVariable(string variable)
 }
 
