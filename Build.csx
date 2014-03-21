@@ -96,6 +96,7 @@ public class Build
 		process.StartInfo.RedirectStandardOutput = true;
 		process.StartInfo.CreateNoWindow = true;
 		process.StartInfo.UseShellExecute = false;
+		process.StartInfo.WorkingDirectory = ".";
 		process.Start();
 		Log(process.StandardOutput.ReadToEnd());
 		process.WaitForExit();
@@ -105,6 +106,12 @@ public class Build
 
 		DisplayAndLog("Process run successfully!");
 		return process.ExitCode == 0;
+	}
+
+	public static void PauseAndWaitForUser()
+	{
+		Console.WriteLine("Process paused... (Press 'enter' to continue)");
+		Console.ReadLine();
 	}
 
 	//Display a string in the console and the log file
