@@ -13,8 +13,11 @@ public class Build
 
 	private static bool _areArgumentsInitialized = false;
 	//Used to initialize the command line arguments
-	public static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
+	private static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
 	{
+		if(scriptArguments == null)
+			throw new Exception("The 'RunTarget()' method must be called with 'Env.ScriptArgs' as parameter! Please add the parameter.");
+			
 		var prefix = "/t:";
 		var targets = scriptArguments.Where(a =>a.StartsWith(prefix));
 		if(targets.Count() == 1)
@@ -27,16 +30,7 @@ public class Build
 	}
 
 	private static string _target = null;
-	public static string Target
-	{
-		get
-		{
-			if(!_areArgumentsInitialized)
-				throw new Exception("Please Add the line 'Build.SetScriptParameters(Env.ScriptArgs);' before calling 'RunTarget()' method!");
-
-			return _target;
-		}
-	}
+	public static string Target { get { return _target; } }
 
 	static List<string> _arguments;
 	public static List<string> Arguments { get { return _arguments; } }
@@ -50,8 +44,11 @@ public class Build
 		return argument.Substring(prefix.Length);
 	}
 
-	public void RunTarget()
+	//Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex:
+	public void RunTarget(IReadOnlyList<string> scriptArguments = null)
 	{
+		SetScriptArguments(scriptArguments);
+		
 		var targets = this.GetType().GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
 			.Where(m => m.GetCustomAttributes(typeof(TargetAttribute), false).Length > 0);
 

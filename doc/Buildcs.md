@@ -5,11 +5,9 @@ Here is the minimum viable build script `MyBuild.csx` (Note that C# comments are
 		//Include the main file of Buildcs
 		#load Build.csx
 		
-		//Pass scripts arguments to Buildcs
-		Build.SetScriptArguments(Env.ScriptArgs);
-		
 		//Create an instance of your build definition and run one off the targets (or the only one existing)
-		new MyBuild().RunTarget();
+		//Must be called with 'Env.ScriptArgs' as parameter
+		new MyBuild().RunTarget(Env.ScriptArgs);
 
 		//Create a class where you define your build configuration
 		//This class MUST inherite the Build class!

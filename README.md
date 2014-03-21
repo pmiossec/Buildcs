@@ -25,8 +25,7 @@ But here is the Build Automation Tool written in C# (with all the ppower of the 
 
 
 		#load Build.csx
-		Build.SetScriptArguments(Env.ScriptArgs);
-		new MyBuild().RunTarget();
+		new MyBuild().RunTarget(Env.ScriptArgs);
 	
 		public class MyBuild : Build
 		{

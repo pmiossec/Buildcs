@@ -8,10 +8,8 @@ using System.Xml;
 
 //Enable/Disable log (default, true)
 Build.LogEnabled = true;
-//Set script arguments (Never remove!)
-Build.SetScriptArguments(Env.ScriptArgs);
 //Run selected target of your custom build definition
-new SampleBuild().RunTarget();
+new SampleBuild().RunTarget(Env.ScriptArgs);
 
 //This class define your custom build (and MUST inherit from 'Build' class)
 public class SampleBuild : Build
