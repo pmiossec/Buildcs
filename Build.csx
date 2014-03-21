@@ -1,6 +1,7 @@
 //Usage:
 //scriptcs.exe build.csx --
 //scriptcs.exe build.csx -- /t:Build /o:other /a:arguments
+using System.Diagnostics;
 
 public class Build
 {
@@ -97,9 +98,18 @@ public class Build
 		process.StartInfo.CreateNoWindow = true;
 		process.StartInfo.UseShellExecute = false;
 		process.StartInfo.WorkingDirectory = ".";
+		process.OutputDataReceived += new DataReceivedEventHandler
+		(
+			delegate(object sender, DataReceivedEventArgs e)
+			{
+				// append the new data to the data already read-in
+				Log(e.Data + "\n");
+			}
+		);
 		process.Start();
-		Log(process.StandardOutput.ReadToEnd());
+		process.BeginOutputReadLine();
 		process.WaitForExit();
+		process.CancelOutputRead();
 
 		if(!continueOnError && process.ExitCode != 0)
 			throw new Exception("Process exit with error! Please consult log file...");
