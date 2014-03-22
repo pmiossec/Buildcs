@@ -16,8 +16,10 @@ public class Build
 	private static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
 	{
 		if(scriptArguments == null)
-			throw new Exception("The 'RunTarget()' method must be called with 'Env.ScriptArgs' as parameter! Please add the parameter.");
-			
+		{
+			DisplayAndLog("The 'RunTarget()' method must be called with 'Env.ScriptArgs' as parameter! Please add the parameter.");
+			System.Environment.Exit(1);		}
+
 		var prefix = "/t:";
 		var targets = scriptArguments.Where(a =>a.StartsWith(prefix));
 		if(targets.Count() == 1)
@@ -48,7 +50,7 @@ public class Build
 	public void RunTarget(IReadOnlyList<string> scriptArguments = null)
 	{
 		SetScriptArguments(scriptArguments);
-		
+
 		var targets = this.GetType().GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
 			.Where(m => m.GetCustomAttributes(typeof(TargetAttribute), false).Length > 0);
 
@@ -68,7 +70,10 @@ public class Build
 		}
 
 		if (method == null)
+		{
 			DisplayAndLog("Target '" + Target + "' not found!");
+			DisplayAndLog("   => Verify the name of the target or add the attribute [Target] to the method...");
+		}
 		else
 		{
 			try
@@ -98,10 +103,11 @@ public class Build
 		process.OutputDataReceived += new DataReceivedEventHandler
 		(
 			delegate(object sender, DataReceivedEventArgs e)
-			{
-				// append the new data to the data already read-in
+		{
+			// append the new data to the data already read-in
 				Log(e.Data + "\n");
-			}
+		}
+
 		);
 		process.Start();
 		process.BeginOutputReadLine();
@@ -109,9 +115,10 @@ public class Build
 		process.CancelOutputRead();
 
 		if(!continueOnError && process.ExitCode != 0)
-			throw new Exception("Process exit with error! Please consult log file...");
+			throw new Exception("Process exit with error! Please consult log file ( " + logFile + ")...");
 
 		DisplayAndLog("Process run successfully!");
+		Console.WriteLine("   => Build log file: " + logFile);
 		return process.ExitCode == 0;
 	}
 
