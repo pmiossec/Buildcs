@@ -61,7 +61,6 @@ public class Build
 				.Where(x => !x.IsSpecialName).Select(m =>m.Name)));
 	}
 
-
 	static List<string> _arguments;
 	public static List<string> Arguments { get { return _arguments; } }
 
@@ -106,6 +105,7 @@ public class Build
 			try
 			{
 				DisplayAndLog("Running target:" + method.Name);
+				Console.WriteLine("   => Build log file: " + logFile);
 				method.Invoke(this, null);
 			}
 			catch(Exception ex)
@@ -113,6 +113,7 @@ public class Build
 				DisplayAndLog("Build failed with error:" + ex.InnerException.Message);
 				System.Environment.Exit(1);
 			}
+
 			finally
 			{
 				Console.WriteLine("   => Build log file: " + logFile);
@@ -139,19 +140,22 @@ public class Build
 		process.StartInfo.UseShellExecute = false;
 		process.StartInfo.WorkingDirectory = ".";
 		process.OutputDataReceived += new DataReceivedEventHandler
-			(
-				delegate(object sender, DataReceivedEventArgs e)
-				{
-					outputBuilder.AppendLine(e.Data);
-					// append the new data to the data already read-in
-					if(displayInLog)
-						Log(e.Data + "\n");
-				}
-			);
-		process.Start();
-		process.BeginOutputReadLine();
-		process.WaitForExit();
-		process.CancelOutputRead();
+		(
+			delegate(object sender, DataReceivedEventArgs e)
+		{
+			outputBuilder.AppendLine(e.Data);
+			// append the new data to the data already read-in
+				if(displayInLog)
+				Log(e.Data + "\n");
+		}
+
+		);
+		Time(() => {
+			process.Start();
+			process.BeginOutputReadLine();
+			process.WaitForExit();
+			process.CancelOutputRead();
+			});
 
 		if(!continueOnError && process.ExitCode != 0)
 			throw new Exception("Process exit with error! Please consult log file ( " + logFile + ")...");
