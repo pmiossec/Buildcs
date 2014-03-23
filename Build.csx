@@ -174,6 +174,15 @@ public class Build
 	{
 		return string.Join(" ", parameters);
 	}
+
+	public static void Time(Action action)
+	{
+		Stopwatch st = new Stopwatch();
+		st.Start();
+		action();
+		st.Stop();
+		DisplayAndLog("Duration:" + st.Elapsed.ToString("mm\\:ss\\.ff"));
+	}
 }
 
 public class TargetAttribute : Attribute
