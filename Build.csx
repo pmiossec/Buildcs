@@ -67,7 +67,7 @@ public class Build
 	//Get command line argument
 	public static string GetArguments(string prefix, string defaultValue)
 	{
-		var argument = Arguments.FirstOrDefault(a =>!a.StartsWith(prefix));
+		var argument = Arguments.FirstOrDefault(a =>a.StartsWith(prefix));
 		if(argument == null)
 			return defaultValue;
 		return argument.Substring(prefix.Length);
