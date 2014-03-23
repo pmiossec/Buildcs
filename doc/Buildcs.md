@@ -76,7 +76,7 @@ Note: The 3rd parameter tell if the build should continue if an error occurs
 
 You could enable debug logs using the code :
 
-	Build.DebugEnabled = true;
+	BuildHelper.DebugEnabled = true;
 
 and using the method in your script:
 
@@ -84,7 +84,7 @@ and using the method in your script:
 
 * Disable log file
 
-		Build.LogEnabled = false;
+		BuildHelper.LogEnabled = false;
 
 
 * You could use [external modules](Modules.md) (like `File.csx`) by using `#load File.csx`
@@ -121,9 +121,9 @@ To write your own module (that you can contribute), you juste have to write a cl
 				//What I want to do
 				
 				//If you want to Launch a process
-				Build.RunTask("myprocess.exe", "arguments");
+				BuildHelper.RunTask("myprocess.exe", "arguments");
 				
 				//or call a methods of Buildcs
-				Build.DisplayAndLog("This is a message!!!);
+				BuildHelper.DisplayAndLog("This is a message!!!);
 			}
 		}

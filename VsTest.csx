@@ -5,16 +5,16 @@ public static class VsTest
 
 	public static void Run(IEnumerable<string> assemblies, string resultFile = "vstest.trx", string testsettings = null)
 	{
-		Build.RunTask(FullPathExe, GetParameters(assemblies, resultFile, testsettings));
+		BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, resultFile, testsettings));
 	}
 
 	public static string GetParameters(IEnumerable<string> assemblies, string resultFile = "vstest.trx", string testsettings = null)
 	{
-		return string.Join(" ", assemblies) + " " + Build.BuildCommand("/logger:trx");
+		return string.Join(" ", assemblies) + " " + BuildHelper.BuildCommand("/logger:trx");
 	}
 
 	public static void Run(string parameters)
 	{
-		Build.RunTask(FullPathExe, parameters);
+		BuildHelper.RunTask(FullPathExe, parameters);
 	}
 }

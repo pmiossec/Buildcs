@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
-public class Build
+public class BuildHelper
 {
 	public static bool DebugEnabled = false;
 	public static string Now { get { return DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"); } }
@@ -55,11 +55,11 @@ public class Build
 		Console.WriteLine();
 		Console.WriteLine("Properties:");
 		Console.WriteLine(string.Join(Environment.NewLine,
-			typeof(Build).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Select(m =>m.Name)));
+			typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Select(m =>m.Name)));
 		Console.WriteLine();
 		Console.WriteLine("Methods:");
 		Console.WriteLine(string.Join("()" + Environment.NewLine,
-			typeof(Build).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+			typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
 				.Where(x => !x.IsSpecialName).Select(m =>m.Name)));
 	}
 

@@ -5,7 +5,7 @@ public static class MsTest
 
 	public static void Run(IEnumerable<string> assemblies, string resultFile = "mstest.trx", string testsettings = null)
 	{
-		Build.RunTask(FullPathExe, GetParameters(assemblies, resultFile, testsettings));
+		BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, resultFile, testsettings));
 	}
 
 	public static string GetParameters(IEnumerable<string> assemblies, string resultFile = "mstest.trx", string testsettings = null)
@@ -16,11 +16,11 @@ public static class MsTest
 			paramAssemblies += @" /testcontainer:" + assembly;
 		}
 
-		return Build.BuildCommand(paramAssemblies, "/resultsfile:"+ resultFile, testsettings == null ? string.Empty : "/testSettings:" + testsettings , "/nologo");
+		return BuildHelper.BuildCommand(paramAssemblies, "/resultsfile:"+ resultFile, testsettings == null ? string.Empty : "/testSettings:" + testsettings , "/nologo");
 	}
 
 	public static void Run(string parameters)
 	{
-		Build.RunTask(FullPathExe, parameters);
+		BuildHelper.RunTask(FullPathExe, parameters);
 	}
 }

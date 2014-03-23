@@ -5,11 +5,11 @@ public static class OpenCover
 
 	public static bool Run(string assemblyFilter, string target, string targetargs, string coverageReportFile = "coverage-report.trx")
 	{
-		return Build.RunTask(FullPathExe, Build.BuildCommand("-register:user", "-filter:" + assemblyFilter, "-target:\"" + target + "\"", "-targetargs:\"" + targetargs + "\"", "-output:" + coverageReportFile), true);
+		return BuildHelper.RunTask(FullPathExe, BuildHelper.BuildCommand("-register:user", "-filter:" + assemblyFilter, "-target:\"" + target + "\"", "-targetargs:\"" + targetargs + "\"", "-output:" + coverageReportFile), true);
 	}
 
 	public static void Run(string parameters)
 	{
-		Build.RunTask(FullPathExe, parameters);
+		BuildHelper.RunTask(FullPathExe, parameters);
 	}
 }

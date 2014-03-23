@@ -7,12 +7,12 @@
 using System.Xml;
 
 //Enable/Disable log (default, true)
-Build.LogEnabled = true;
+BuildHelper.LogEnabled = true;
 //Run selected target of your custom build definition
 new SampleBuild().RunTarget(Env.ScriptArgs);
 
 //This class define your custom build (and MUST inherit from 'Build' class)
-public class SampleBuild : Build
+public class SampleBuild : BuildHelper
 {
 	//Run before the Target called
 	public SampleBuild()
