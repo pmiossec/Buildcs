@@ -87,6 +87,10 @@ public class Build
 				DisplayAndLog("Build failed with error:" + ex.InnerException.Message);
 				System.Environment.Exit(1);
 			}
+			finally
+			{
+				Console.WriteLine("   => Build log file: " + logFile);
+			}
 		}
 	}
 
@@ -94,10 +98,10 @@ public class Build
 	public static bool RunTask(string command, string arguments = null, bool continueOnError = false)
 	{
 		string output;
-		return RunTask(out output, command, arguments, continueOnError);
+		return RunTask(out output, command, arguments, continueOnError, true);
 	}
 
-	public static bool RunTask(out string output, string command, string arguments = null, bool continueOnError = false)
+	public static bool RunTask(out string output, string command, string arguments = null, bool continueOnError = false, bool displayInLog = false)
 	{
 		StringBuilder outputBuilder = new StringBuilder();
 		DisplayAndLog("Running command:" + command + " " + arguments);
@@ -114,7 +118,8 @@ public class Build
 				{
 					outputBuilder.AppendLine(e.Data);
 					// append the new data to the data already read-in
-					Log(e.Data + "\n");
+					if(displayInLog)
+						Log(e.Data + "\n");
 				}
 			);
 		process.Start();
@@ -126,8 +131,8 @@ public class Build
 			throw new Exception("Process exit with error! Please consult log file ( " + logFile + ")...");
 
 		output = outputBuilder.ToString().TrimEnd('\n', '\r');
-		DisplayAndLog("Process run successfully!");
-		Console.WriteLine("   => Build log file: " + logFile);
+		if(displayInLog)
+			DisplayAndLog("Process run successfully!");
 		return process.ExitCode == 0;
 	}
 
