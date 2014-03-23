@@ -15,7 +15,7 @@ public class Build
 
 	private static bool _areArgumentsInitialized = false;
 	//Used to initialize the command line arguments
-	private static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
+	public static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
 	{
 		if(scriptArguments == null)
 		{
@@ -30,6 +30,8 @@ public class Build
 			throw new Exception(string.Format("You should specify only 1 target with option '{0}'!", prefix));
 
 		_arguments = scriptArguments.Where(a =>!a.StartsWith(prefix)).ToList();
+		DisplayAndLog("Arguments:" + (Arguments.Any() ? string.Join("," , Arguments) : "(none)"));
+
 		_areArgumentsInitialized = true;
 	}
 
@@ -79,7 +81,6 @@ public class Build
 		SetScriptArguments(scriptArguments);
 
 		var targets = Targets;
-
 		System.Reflection.MethodInfo method;
 		if(string.IsNullOrEmpty(Target))
 		{
