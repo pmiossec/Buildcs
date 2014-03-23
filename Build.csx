@@ -156,15 +156,20 @@ public class Build
 			process.BeginOutputReadLine();
 			process.WaitForExit();
 			process.CancelOutputRead();
-			});
+		});
 
 		if(!continueOnError && process.ExitCode != 0)
 			throw new Exception("Process exit with error! Please consult log file ( " + logFile + ")...");
 
 		output = outputBuilder.ToString().TrimEnd('\n', '\r');
-		if(displayInLog)
-			DisplayAndLog("Process run successfully!");
-		return process.ExitCode == 0;
+		if(process.ExitCode == 0)
+		{
+			if(displayInLog)
+				DisplayAndLog("Process run successfully!");
+			return true;
+		}
+		DisplayAndLog("Process exited with an error :(");
+		return false;
 	}
 
 	public static void PauseAndWaitForUser()
