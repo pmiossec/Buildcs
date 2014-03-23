@@ -54,15 +54,20 @@ public class BuildHelper
 		Console.WriteLine("Available targets: " + string.Join(", " , TargetNames));
 		Console.WriteLine();
 		Console.WriteLine("Properties:");
-		Console.WriteLine(string.Join(Environment.NewLine,
-			typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Select(m =>m.Name)));
+		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static))
+			Console.WriteLine(property.PropertyType + " " + property.Name + "{" + (property.CanRead ? " get;" : string.Empty)  + (property.CanWrite ? " set;" : string.Empty) + "}" );
 		Console.WriteLine();
 		Console.WriteLine("Methods:");
-		Console.WriteLine(string.Join("()" + Environment.NewLine,
-			typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
-				.Where(x => !x.IsSpecialName).Select(m =>m.Name)));
+		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+			.Where(x => !x.IsSpecialName))
+			DisplayMethod(method);
 	}
 
+	private void DisplayMethod(MethodInfo method)
+	{
+		Console.WriteLine(method.Name+"(" + string.Join(", ", method.GetParameters().Select(p=>p.ParameterType + " " + p.Name)) + ")");
+	}
+	
 	static List<string> _arguments;
 	public static List<string> Arguments { get { return _arguments; } }
 
