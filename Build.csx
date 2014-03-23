@@ -2,6 +2,7 @@
 //scriptcs.exe build.csx --
 //scriptcs.exe build.csx -- /t:Build /o:other /a:arguments
 using System.Diagnostics;
+using System.Text;
 
 public class Build
 {
@@ -46,7 +47,7 @@ public class Build
 		return argument.Substring(prefix.Length);
 	}
 
-	//Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex:
+	//Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex: new MyBuild().RunTarget(Env.ScriptArgs);
 	public void RunTarget(IReadOnlyList<string> scriptArguments = null)
 	{
 		SetScriptArguments(scriptArguments);
@@ -92,6 +93,13 @@ public class Build
 	//Run a command line task!
 	public static bool RunTask(string command, string arguments = null, bool continueOnError = false)
 	{
+		string output;
+		return RunTask(out output, command, arguments, continueOnError);
+	}
+
+	public static bool RunTask(out string output, string command, string arguments = null, bool continueOnError = false)
+	{
+		StringBuilder outputBuilder = new StringBuilder();
 		DisplayAndLog("Running command:" + command + " " + arguments);
 		var process = new System.Diagnostics.Process();
 		process.StartInfo.FileName = command;
@@ -101,14 +109,14 @@ public class Build
 		process.StartInfo.UseShellExecute = false;
 		process.StartInfo.WorkingDirectory = ".";
 		process.OutputDataReceived += new DataReceivedEventHandler
-		(
-			delegate(object sender, DataReceivedEventArgs e)
-		{
-			// append the new data to the data already read-in
-				Log(e.Data + "\n");
-		}
-
-		);
+			(
+				delegate(object sender, DataReceivedEventArgs e)
+				{
+					outputBuilder.AppendLine(e.Data);
+					// append the new data to the data already read-in
+					Log(e.Data + "\n");
+				}
+			);
 		process.Start();
 		process.BeginOutputReadLine();
 		process.WaitForExit();
@@ -117,6 +125,7 @@ public class Build
 		if(!continueOnError && process.ExitCode != 0)
 			throw new Exception("Process exit with error! Please consult log file ( " + logFile + ")...");
 
+		output = outputBuilder.ToString().TrimEnd('\n', '\r');
 		DisplayAndLog("Process run successfully!");
 		Console.WriteLine("   => Build log file: " + logFile);
 		return process.ExitCode == 0;
@@ -124,7 +133,7 @@ public class Build
 
 	public static void PauseAndWaitForUser()
 	{
-		Console.WriteLine("Process paused... (Press 'enter' to continue)");
+		Console.WriteLine("Build process paused... (Press 'enter' to continue)");
 		Console.ReadLine();
 	}
 
@@ -154,6 +163,11 @@ public class Build
 	{
 		if(DebugEnabled)
 			Log("[DEBUG]" + log);
+	}
+
+	public static string BuildCommand(params string[] parameters)
+	{
+		return string.Join(" ", parameters);
 	}
 }
 
