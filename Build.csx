@@ -2,6 +2,7 @@
 //scriptcs.exe build.csx --
 //scriptcs.exe build.csx -- /t:Build /o:other /a:arguments
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 public class Build
@@ -34,6 +35,32 @@ public class Build
 
 	private static string _target = null;
 	public static string Target { get { return _target; } }
+	private List<MethodInfo> Targets
+	{
+		get
+		{
+			return this.GetType().GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+			.Where(m => m.GetCustomAttributes(typeof(TargetAttribute), false).Length > 0).ToList();
+		}
+	}
+
+	public List<string> TargetNames { get { return Targets.Select(m =>m.Name).ToList(); } }
+
+	[Target]
+	public void Help()
+	{
+		Console.WriteLine("Available targets: " + string.Join(", " , TargetNames));
+		Console.WriteLine();
+		Console.WriteLine("Properties:");
+		Console.WriteLine(string.Join(Environment.NewLine,
+			typeof(Build).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).Select(m =>m.Name)));
+		Console.WriteLine();
+		Console.WriteLine("Methods:");
+		Console.WriteLine(string.Join("()" + Environment.NewLine,
+			typeof(Build).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+				.Where(x => !x.IsSpecialName).Select(m =>m.Name)));
+	}
+
 
 	static List<string> _arguments;
 	public static List<string> Arguments { get { return _arguments; } }
@@ -52,8 +79,7 @@ public class Build
 	{
 		SetScriptArguments(scriptArguments);
 
-		var targets = this.GetType().GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
-			.Where(m => m.GetCustomAttributes(typeof(TargetAttribute), false).Length > 0);
+		var targets = Targets;
 
 		System.Reflection.MethodInfo method;
 		if(string.IsNullOrEmpty(Target))
