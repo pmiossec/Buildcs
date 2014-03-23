@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 public class Files
 {
 	//Copy folder content to another folder
@@ -71,5 +73,10 @@ public class Files
 		{
 			System.IO.Directory.Delete(directoryPath, true);
 		}
+	}
+
+	public static void ReplaceText(string filePath, string regex, string newText)
+	{
+		File.WriteAllText(filePath, Regex.Replace(File.ReadAllText(filePath), regex, newText));
 	}
 }
