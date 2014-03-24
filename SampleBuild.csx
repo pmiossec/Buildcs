@@ -6,10 +6,10 @@
 //scriptcs.exe SampleBuild.csx -- /t:Build /c:Debug /b:MyBranch
 using System.Xml;
 
-//Enable/Disable log (default, true)
+//Enable/Disable log (default: true)
 BuildHelper.LogEnabled = true;
 //Run selected target of your custom build definition
-new SampleBuild().RunTarget(Env.ScriptArgs);
+BuildHelper.RunTarget(typeof(MyBuild), Env.ScriptArgs);
 
 //This class define your custom build (and MUST inherit from 'Build' class)
 public class SampleBuild : BuildHelper

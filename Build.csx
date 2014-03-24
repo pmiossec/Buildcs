@@ -89,11 +89,13 @@ public class BuildHelper
 	}
 
 	[Display(Description="Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex: new MyBuild().RunTarget(Env.ScriptArgs)")]
-	public void RunTarget(IReadOnlyList<string> scriptArguments = null)
+	public static void RunTarget(Type type, IReadOnlyList<string> scriptArguments = null)
 	{
 		SetScriptArguments(scriptArguments);
 
-		var targets = Targets;
+		var customBuild = (BuildHelper)Activator.CreateInstance(type);
+		var targets = customBuild.Targets;
+
 		System.Reflection.MethodInfo method;
 		if(string.IsNullOrEmpty(Target))
 		{
@@ -120,7 +122,7 @@ public class BuildHelper
 			{
 				DisplayAndLog("Running target:" + method.Name);
 				Console.WriteLine("   => Build log file: " + logFile);
-				method.Invoke(this, null);
+				method.Invoke(customBuild, null);
 			}
 			catch(Exception ex)
 			{

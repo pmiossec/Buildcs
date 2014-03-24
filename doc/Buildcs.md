@@ -5,13 +5,13 @@ Here is the minimum viable build script `MyBuild.csx` (Note that C# comments are
 		//Include the main file of Buildcs
 		#load Build.csx
 		
-		//Create an instance of your build definition and run one off the targets (or the only one existing)
-		//Must be called with 'Env.ScriptArgs' as parameter
-		new MyBuild().RunTarget(Env.ScriptArgs);
+		//Bootstrap: Run the selected targets (or the only existing one)
+		//Must be called with the type of your build class and 'Env.ScriptArgs' as parameters
+		BuildHelper.RunTarget(typeof(MyBuild), Env.ScriptArgs);
 
 		//Create a class where you define your build configuration
-		//This class MUST inherite the Build class!
-		public class MyBuild : Build
+		//This class MUST inherite the BuildHelper class and have a no parameter constructor!
+		public class MyBuild : BuildHelper
 		{
 			//Define at least one method with the attribute [Target]
 			//which define methods that your could run
