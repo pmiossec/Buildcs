@@ -19,7 +19,7 @@ Here is the minimum viable build script `MyBuild.csx` (Note that C# comments are
 			void HelloWorld()
 			{
 				//Define the action that must be done in this target
-				System.Console.WriteLine("Hello, world!");
+				Console.WriteLine("Hello, world!");
 				
 				//Launch an external command
 				RunTask("echo", "Hello, too!");

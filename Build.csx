@@ -215,7 +215,7 @@ public class BuildHelper
 	[Display(Description="Method to call to display a string in the console and the log file.")]
 	public static void DisplayAndLog(string log)
 	{
-		System.Console.WriteLine(log);
+		Console.WriteLine(log);
 		Log(Now + ":" + log+"\n");
 	}
 

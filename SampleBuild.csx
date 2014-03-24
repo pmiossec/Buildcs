@@ -41,7 +41,7 @@ public class SampleBuild : BuildHelper
 	[Target]
 	void Help()
 	{
-		System.Console.WriteLine(Configuration);
+		Console.WriteLine(Configuration);
 	}
 
 	[Target]

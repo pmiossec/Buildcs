@@ -32,7 +32,7 @@ But here is the Build Automation Tool written in C# (with all the ppower of the 
 			[Target]
 			void HelloWorld()
 			{
-				System.Console.WriteLine("Hello, world!");
+				Console.WriteLine("Hello, world!");
 				
 				RunTask("echo", "Hello, too!");
 			}
