@@ -11,13 +11,19 @@ public class BuildHelper
 {
 	[Display(Description = "Enable/Disable debug logging.")]
 	public static bool DebugEnabled { get; set; }
+	
 	[Display(Description = "String representative of the date 'Now'.")]
 	public static string Now { get { return DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"); } }
+	
 	private static string logFile = "build_log_" + Now + ".txt";
 	[Display(Description = "Path of the build log file.")]
-	public static string LogFile { get { return logFile; } }
+	public static string LogFile { get { return Path.Combine(LogPath?? string.Empty, logFile); } }
+	
 	[Display(Description = "Enable/Disable logging.")]
 	public static bool LogDisabled { get; set; }
+	
+	[Display(Description = "Path of the log file. Set MUST be done before RunTarget() call!")]
+	public static string LogPath { get; set; }
 
 	private static bool _areArgumentsInitialized = false;
 	[Display(Description = "Method used to set script arguments.")]
@@ -83,13 +89,14 @@ public class BuildHelper
 		{
 			DisplayAndLog("Target '" + Target + "' not found!");
 			DisplayAndLog("   => Verify the name of the target or add the attribute [Target] to the method...");
+			Console.WriteLine("      Available targets: " + string.Join(", " , customBuild.TargetNames));
 		}
 		else
 		{
 			try
 			{
 				DisplayAndLog("Running target:" + method.Name);
-				Console.WriteLine("   => Build log file: " + logFile);
+				Console.WriteLine("   => Build log file: " + LogFile);
 				method.Invoke(customBuild, null);
 			}
 			catch(Exception ex)
@@ -100,7 +107,7 @@ public class BuildHelper
 
 			finally
 			{
-				Console.WriteLine("   => Build log file: " + logFile);
+				Console.WriteLine("   => Build log file: " + LogFile);
 			}
 		}
 	}
@@ -117,7 +124,7 @@ public class BuildHelper
 		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
 		{
 			DisplayComment(property);
-			Console.WriteLine("  " + property.PropertyType + " " + property.Name + " {" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + "}");
+			Console.WriteLine("  " + property.PropertyType + " " + property.Name + " {" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + " }");
 			Console.WriteLine();
 		}
 		Console.WriteLine();
@@ -190,7 +197,7 @@ public class BuildHelper
 		if(!continueOnError && process.ExitCode != 0)
 		{
 			Console.WriteLine(outputBuilder.ToString().TrimEnd('\n', '\r'));
-			throw new Exception("Process exited with an error! Please consult log file ( " + logFile + ")...");
+			throw new Exception("Process exited with an error! Please consult log file ( " + LogFile + ")...");
 		}
 
 		output = outputBuilder.ToString().TrimEnd('\n', '\r');
@@ -223,7 +230,7 @@ public class BuildHelper
 	public static void Log(string log)
 	{
 		if(!LogDisabled)
-			File.AppendAllText(logFile, log);
+			File.AppendAllText(LogFile, log);
 	}
 
 	[Display(Description="Write a Debug log.")]
