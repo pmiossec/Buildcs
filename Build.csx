@@ -175,7 +175,10 @@ public class BuildHelper
 		});
 
 		if(!continueOnError && process.ExitCode != 0)
-			throw new Exception("Process exit with error! Please consult log file ( " + logFile + ")...");
+		{
+			Console.WriteLine(outputBuilder.ToString().TrimEnd('\n', '\r'));
+			throw new Exception("Process exited with an error! Please consult log file ( " + logFile + ")...");
+		}
 
 		output = outputBuilder.ToString().TrimEnd('\n', '\r');
 		if(process.ExitCode == 0)
