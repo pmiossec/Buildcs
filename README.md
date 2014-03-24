@@ -7,13 +7,13 @@ Build Automation Tool for C# developpers (using Scriptcs, scripts written in C#)
 
 There is plenty of tools to automate builds in every language. In .Net world, we have the (bad) old msbuild (horrible xml), psake (powershell) or FAKE (F#).
 
-But here is the Build Automation Tool written in C# (with all the ppower of the .Net framework). Because, as a .Net developper, that's the language you master the best!
+But here is the Build Automation Tool written in C# (with all the power of the .Net framework). Because, as a .Net developper, that's the language you master the best ;)
 
 # Features
 
 * Define easily the tasks run in C#
 * Define multiple targets in the same file
-* Extend very easily with your modules
+* Extend very easily with your own modules
 
 # Getting started
 

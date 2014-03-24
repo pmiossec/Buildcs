@@ -17,8 +17,8 @@ public static class Git
 		return branch;
 	}
 	
-	public static void Run(string parameters)
+	public static bool Run(string parameters)
 	{
-		BuildHelper.RunTask(FullPathExe, parameters);
+		return BuildHelper.RunTask(FullPathExe, parameters);
 	}
 }

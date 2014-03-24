@@ -5,6 +5,7 @@ public class Files
 	//Copy folder content to another folder
     public static void CopyFolder(string sourceDirName, string destDirName, bool copySubDirs = true, bool overwrite = false)
 	{
+		BuildHelper.DisplayAndLog("Copying directory '" +  sourceDirName + "' to '" +  destDirName + "'...");
 		// Get the subdirectories for the specified directory.
         DirectoryInfo dir = new DirectoryInfo(sourceDirName);
 		DirectoryInfo[] dirs = dir.GetDirectories();
@@ -44,26 +45,29 @@ public class Files
 	{
 		if(System.IO.File.Exists(filePath))
 		{
+			BuildHelper.DisplayAndLog("Deleting file '" +  filePath + "'...");
 			System.IO.File.Delete(filePath);
 		}
+	}
+
+	//Get all the files of a directory following a regex patern
+	public static string[] GetFilesWithPattern(string parentDirectoryPath, string filePattern, bool subdirectories = false)
+	{
+		return System.IO.Directory.GetFiles(parentDirectoryPath, filePattern, subdirectories ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly );
 	}
 
 	//Delete all the files of a directory following a regex patern
 	public static void DeleteFilesWithPattern(string parentDirectoryPath, string filePattern)
 	{
-		foreach(var directory in System.IO.Directory.GetFiles(parentDirectoryPath, filePattern))
-		{
+		foreach(var directory in GetFilesWithPattern(parentDirectoryPath, filePattern))
 			DeleteFile(directory);
-		}
 	}
 
 	//Delete all the subdirectories of a directory following a regex patern
 	public static void DeleteDirectoriesWithPattern(string parentDirectoryPath, string directoryPattern)
 	{
 		foreach(var directory in System.IO.Directory.GetDirectories(parentDirectoryPath, directoryPattern))
-		{
 			DeleteDirectory(directory);
-		}
 	}
 
 	//Delete a directory
@@ -71,12 +75,14 @@ public class Files
 	{
 		if(System.IO.Directory.Exists(directoryPath))
 		{
+			BuildHelper.DisplayAndLog("Deleting directory '" +  directoryPath + "'...");
 			System.IO.Directory.Delete(directoryPath, true);
 		}
 	}
 
 	public static void ReplaceText(string filePath, string regex, string newText)
 	{
+		BuildHelper.DisplayAndLog("Replacing text in file '" +  filePath + "'...");
 		File.WriteAllText(filePath, Regex.Replace(File.ReadAllText(filePath), regex, newText));
 	}
 }

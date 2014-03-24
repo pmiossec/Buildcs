@@ -1,6 +1,6 @@
 # Write your first build script
 
-Here is the minimum viable build script `MyBuild.csx` (Note that C# comments are not allowed before the last line beginning by a '#' and are here for sample comprehension):
+Here is the minimum viable build script `MyBuild.csx` (Note that C# comments are not allowed before the last line beginning by a '#' and are here for comprehension):
 
 		//Include the main file of Buildcs
 		#load Build.csx
@@ -44,6 +44,10 @@ Note:
 		
 # Built-in features
 
+You could get an up to date help on the API by launching the target "Help":
+
+		scriptcs MyBuild.csx -- /t:Help
+
 * Get one argument of the build script
 
 		var configuration = GetArguments("/config:", "Release");
@@ -84,7 +88,7 @@ and using the method in your script:
 
 * Disable log file
 
-		BuildHelper.LogEnabled = false;
+		BuildHelper.LogDisabled = true;
 
 
 * You could use [external modules](Modules.md) (like `File.csx`) by using `#load File.csx`
@@ -95,7 +99,7 @@ and using the method in your script:
 # Advice
 
 * Do not hesitate to create one method for each task to do and call theses methods in your different targets!
-* See [SampleBuild.csx](./examples/SampleBuild.csx) for an example...
+* See [SampleBuild.csx](../examples/SampleBuild.csx) for an example...
 
 
 # Some help on Scriptcs
@@ -108,9 +112,23 @@ and using the method in your script:
 because Scriptcs return no errors during compilation and do nothing if one is missing :(
 * Scriptcs take ~10 seconds to compile the script before running it, so wait ;) 
 
-# Write a module
+# Modules
 
-To write your own module (that you can contribute), you juste have to write a class with `static` methods.
+You can extand the feature of Buildcs with external modules
+
+## List of the existing modules
+
+* [Files.csx](../Files.csx): Manage files and directories
+* [MsBuild.csx](../MsBuild.csx): Run MsBuild
+* [MsTest.csx](../MsTest.csx): Run MsTest (Microsoft unit test framework)
+* [VsTest.csx](../VsTest.csx): Run VsTest (New runtime for Microsoft unit test framework)
+* [OpenCover.csx](../OpenCover.csx): Run [Opencover](https://github.com/OpenCover/opencover)
+* [Git.csx](../Git.csx): Manage a Git repository
+* [Zip.csx](../Zip.csx): Zip files in an archive
+
+## Write a module
+
+To write your own module (that you can contribute by a pull request), you just have to write a class with `static` methods.
 
 		using System.IO.Compression;
 

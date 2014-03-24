@@ -7,12 +7,11 @@ public class Zip
 	//Zip some files in a zip file
 	public static void ZipFilesInArchive(string zipname, params string[] filePaths)
 	{
+		DisplayAndLog("Creation of the zip file '" + zipname + "'...");
 		using (ZipArchive newFile = ZipFile.Open(zipName, ZipArchiveMode.Create))
 		{
 			foreach(var file in filePaths)
-			{
 				newFile.CreateEntryFromFile(file, System.IO.Path.GetFileName(file));
-			}
 		}
 	}
 }

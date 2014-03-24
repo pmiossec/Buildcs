@@ -3,19 +3,19 @@ public static class MsBuild
 	public static string PathToExe { get; set; }
 	public static string FullPathExe { get { return Path.Combine(PathToExe ?? string.Empty, "msbuild.exe"); } }
 
-	public static void Run(string projectFile, string configuration = "Release", bool parallelBuild = true, string target = "Build", string otherProperties = null, string otherParameters = null)
+	public static bool Run(string projectFile, string configuration = "Release", bool parallelBuild = true, string target = "Build", string otherProperties = null, string otherParameters = null)
 	{
 		var buildParams = BuildHelper.BuildCommand(projectFile, "/t:" + target , parallelBuild ? "/m" : string.Empty, " /p:Configuration=" + configuration + otherProperties, otherParameters);
-		BuildHelper.RunTask(FullPathExe, buildParams);
+		return BuildHelper.RunTask(FullPathExe, buildParams);
 	}
 
-	public static void Clean(string projectFile, string configuration = "Release")
+	public static bool Clean(string projectFile, string configuration = "Release")
 	{
-		BuildHelper.RunTask(FullPathExe, BuildHelper.BuildCommand(projectFile, "/t:clean", "/p:Configuration=" + configuration));
+		return BuildHelper.RunTask(FullPathExe, BuildHelper.BuildCommand(projectFile, "/t:clean", "/p:Configuration=" + configuration));
 	}
 
-	public static void Run(string parameters)
+	public static bool Run(string parameters)
 	{
-		BuildHelper.RunTask(FullPathExe, parameters);
+		return BuildHelper.RunTask(FullPathExe, parameters);
 	}
 }
