@@ -1,9 +1,11 @@
+#r System.ComponentModel.DataAnnotations.dll
 //Usage:
 //scriptcs.exe build.csx --
 //scriptcs.exe build.csx -- /t:Build /o:other /a:arguments
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 public class BuildHelper
 {
@@ -15,6 +17,7 @@ public class BuildHelper
 
 	private static bool _areArgumentsInitialized = false;
 	//Used to initialize the command line arguments
+	[Display(Description="Method used to set script arguments.")]
 	public static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
 	{
 		if(scriptArguments == null)
@@ -49,29 +52,34 @@ public class BuildHelper
 	public List<string> TargetNames { get { return Targets.Select(m =>m.Name).ToList(); } }
 
 	[Target]
+	[Display(Description="Default [Target] to display some help.")]
 	public void Help()
 	{
 		Console.WriteLine("Available targets: " + string.Join(", " , TargetNames));
 		Console.WriteLine();
 		Console.WriteLine("Properties:");
-		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static))
-			Console.WriteLine(property.PropertyType + " " + property.Name + "{" + (property.CanRead ? " get;" : string.Empty)  + (property.CanWrite ? " set;" : string.Empty) + "}" );
+		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
+			Console.WriteLine(property.PropertyType + " " + property.Name + "{" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + "}");
 		Console.WriteLine();
 		Console.WriteLine("Methods:");
 		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
 			.Where(x => !x.IsSpecialName))
-			DisplayMethod(method);
+		DisplayMethod(method);
 	}
 
 	private void DisplayMethod(MethodInfo method)
 	{
+		var comment = method.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault();
+		if(comment != null)
+			Console.WriteLine(((DisplayAttribute)comment).Description);
 		Console.WriteLine(method.Name+"(" + string.Join(", ", method.GetParameters().Select(p=>p.ParameterType + " " + p.Name)) + ")");
+		Console.WriteLine();
 	}
 	
 	static List<string> _arguments;
 	public static List<string> Arguments { get { return _arguments; } }
 
-	//Get command line argument
+	[Display(Description="Method to call to get the value of a script argument. If no argument found, the default value is returned.")]
 	public static string GetArguments(string prefix, string defaultValue)
 	{
 		var argument = Arguments.FirstOrDefault(a =>a.StartsWith(prefix));
@@ -80,7 +88,7 @@ public class BuildHelper
 		return argument.Substring(prefix.Length);
 	}
 
-	//Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex: new MyBuild().RunTarget(Env.ScriptArgs);
+	[Display(Description="Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex: new MyBuild().RunTarget(Env.ScriptArgs)")]
 	public void RunTarget(IReadOnlyList<string> scriptArguments = null)
 	{
 		SetScriptArguments(scriptArguments);
@@ -127,13 +135,14 @@ public class BuildHelper
 		}
 	}
 
-	//Run a command line task!
+	[Display(Description="Method to call to Launch a process.")]
 	public static bool RunTask(string command, string arguments = null, bool continueOnError = false)
 	{
 		string output;
 		return RunTask(out output, command, arguments, continueOnError, true);
 	}
 
+	[Display(Description="Method to call to Launch a process with the console ouput.")]
 	public static bool RunTask(out string output, string command, string arguments = null, bool continueOnError = false, bool displayInLog = false)
 	{
 		StringBuilder outputBuilder = new StringBuilder();
@@ -177,27 +186,28 @@ public class BuildHelper
 		return false;
 	}
 
+	[Display(Description="Method to call to pause the process when debugging and waiting for user action to restart.")]
 	public static void PauseAndWaitForUser()
 	{
 		Console.WriteLine("Build process paused... (Press 'enter' to continue)");
 		Console.ReadLine();
 	}
 
-	//Display a string in the console and the log file
+	[Display(Description="Method to call to display a string in the console and the log file.")]
 	public static void DisplayAndLog(string log)
 	{
 		System.Console.WriteLine(log);
 		Log(Now + ":" + log+"\n");
 	}
 
-	//Write a string in the log
+	[Display(Description="Method to call to write a string in the log.")]
 	public static void Log(string log)
 	{
 		if(LogEnabled)
 			File.AppendAllText(logFile, log);
 	}
 
-	//Get the value of an environnement variable
+	[Display(Description="Method to call to get the value of an environnement variable.")]
 	public static string GetEnvironnementVariable(string variable)
 	{
 		var envVar = Environment.GetEnvironmentVariable(variable);
@@ -211,11 +221,13 @@ public class BuildHelper
 			Log("[DEBUG]" + log);
 	}
 
+	[Display(Description="Method to call to easily build command parameters.")]
 	public static string BuildCommand(params string[] parameters)
 	{
 		return string.Join(" ", parameters);
 	}
 
+	[Display(Description="Method to call to time the duration of a method.")]
 	public static void Time(Action action)
 	{
 		Stopwatch st = new Stopwatch();
