@@ -9,11 +9,15 @@ using System.ComponentModel.DataAnnotations;
 
 public class BuildHelper
 {
-	public static bool DebugEnabled = false;
+	[Display(Description = "Enable/Disable debug logging.")]
+	public static bool DebugEnabled { get; set; }
+	[Display(Description = "String representative of the date 'Now'.")]
 	public static string Now { get { return DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"); } }
 	private static string logFile = "build_log_" + Now + ".txt";
+	[Display(Description = "Path of the build log file.")]
 	public static string LogFile { get { return logFile; } }
-	public static bool LogEnabled = true;
+	[Display(Description = "Enable/Disable logging.")]
+	public static bool LogDisabled { get; set; }
 
 	private static bool _areArgumentsInitialized = false;
 	[Display(Description = "Method used to set script arguments.")]
@@ -38,6 +42,7 @@ public class BuildHelper
 	}
 
 	private static string _target = null;
+	[Display(Description = "Names of the called target.")]
 	public static string Target { get { return _target; } }
 	private List<MethodInfo> Targets
 	{
@@ -48,6 +53,7 @@ public class BuildHelper
 		}
 	}
 
+	[Display(Description = "Names of the available targets.")]
 	public List<string> TargetNames { get { return Targets.Select(m =>m.Name).ToList(); } }
 
 	[Display(Description = "Main Method that MUST be called to Launch your [Target]. ex: BuildHelper.RunTarget(typeof(MyBuild),Env.ScriptArgs)")]
@@ -109,7 +115,11 @@ public class BuildHelper
 		Console.WriteLine("-----------");
 		Console.WriteLine();
 		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
-			Console.WriteLine(property.PropertyType + " " + property.Name + "{" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + "}");
+		{
+			DisplayComment(property);
+			Console.WriteLine("  " + property.PropertyType + " " + property.Name + " {" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + "}");
+			Console.WriteLine();
+		}
 		Console.WriteLine();
 		Console.WriteLine("Methods:");
 		Console.WriteLine("--------");
@@ -119,16 +129,21 @@ public class BuildHelper
 		DisplayMethod(method);
 	}
 
-	private void DisplayMethod(MethodInfo method)
+	private void DisplayComment(MemberInfo method)
 	{
 		var comment = method.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault();
 		if(comment != null)
 			Console.WriteLine("* " + ((DisplayAttribute)comment).Description);
+	}
+	private void DisplayMethod(MethodInfo method)
+	{
+		DisplayComment(method);
 		Console.WriteLine("  " + method.Name+"(" + string.Join(", ", method.GetParameters().Select(p =>p.ParameterType + " " + p.Name)) + ")");
 		Console.WriteLine();
 	}
 
 	static List<string> _arguments;
+	[Display(Description = "Arguments passed to the build script (except the target).")]
 	public static List<string> Arguments { get { return _arguments; } }
 
 	[Display(Description = "Method to call to get the value of a script argument. If no argument found, the default value is returned.")]
@@ -207,7 +222,7 @@ public class BuildHelper
 	[Display(Description="Method to call to write a string in the log.")]
 	public static void Log(string log)
 	{
-		if(LogEnabled)
+		if(!LogDisabled)
 			File.AppendAllText(logFile, log);
 	}
 
