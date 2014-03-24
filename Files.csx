@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 public class Files
 {
 	//Copy folder content to another folder
-    public static void CopyFolder(string sourceDirName, string destDirName, bool copySubDirs = true)
+    public static void CopyFolder(string sourceDirName, string destDirName, bool copySubDirs = true, bool overwrite = false)
 	{
 		// Get the subdirectories for the specified directory.
         DirectoryInfo dir = new DirectoryInfo(sourceDirName);
@@ -25,7 +25,7 @@ public class Files
 		foreach (FileInfo file in files)
 		{
 			string temppath = Path.Combine(destDirName, file.Name);
-			file.CopyTo(temppath, false);
+			file.CopyTo(temppath, overwrite);
 		}
 
 		// If copying subdirectories, copy them and their contents to new location. 
@@ -34,7 +34,7 @@ public class Files
 			foreach (DirectoryInfo subdir in dirs)
 			{
 				string temppath = Path.Combine(destDirName, subdir.Name);
-				CopyFolder(subdir.FullName, temppath, copySubDirs);
+				CopyFolder(subdir.FullName, temppath, copySubDirs, overwrite);
 			}
 		}
 	}
