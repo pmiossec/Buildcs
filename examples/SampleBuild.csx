@@ -78,7 +78,6 @@ public class SampleBuild : BuildHelper
 		}
 	}
 
-	
 	void Publish()
 	{
 		Files.CopyFolder(LocalPublishFolder, PublishFolder);

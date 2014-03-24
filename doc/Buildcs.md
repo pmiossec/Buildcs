@@ -95,7 +95,7 @@ and using the method in your script:
 # Advice
 
 * Do not hesitate to create one method for each task to do and call theses methods in your different targets!
-* See [SampleBuild.csx](../SampleBuild.csx) for an exemple...
+* See [SampleBuild.csx](./examples/SampleBuild.csx) for an example...
 
 
 # Some help on Scriptcs
