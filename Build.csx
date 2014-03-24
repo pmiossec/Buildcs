@@ -159,17 +159,12 @@ public class BuildHelper
 		process.StartInfo.CreateNoWindow = true;
 		process.StartInfo.UseShellExecute = false;
 		process.StartInfo.WorkingDirectory = ".";
-		process.OutputDataReceived += new DataReceivedEventHandler
-		(
-			delegate(object sender, DataReceivedEventArgs e)
-		{
+		process.OutputDataReceived += new DataReceivedEventHandler((sender, e) => {
 			outputBuilder.AppendLine(e.Data);
-			// append the new data to the data already read-in
-				if(displayInLog)
+			if(displayInLog)
 				Log(e.Data + "\n");
-		}
-
-		);
+		});
+		
 		Time(() => {
 			process.Start();
 			process.BeginOutputReadLine();
