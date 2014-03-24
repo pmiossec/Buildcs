@@ -16,9 +16,8 @@ public class BuildHelper
 	public static bool LogEnabled = true;
 
 	private static bool _areArgumentsInitialized = false;
-	//Used to initialize the command line arguments
-	[Display(Description="Method used to set script arguments.")]
-	public static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
+	[Display(Description = "Method used to set script arguments.")]
+	private static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
 	{
 		if(scriptArguments == null)
 		{
@@ -52,16 +51,20 @@ public class BuildHelper
 	public List<string> TargetNames { get { return Targets.Select(m =>m.Name).ToList(); } }
 
 	[Target]
-	[Display(Description="Default [Target] to display some help.")]
+	[Display(Description = "Default [Target] to display some help.")]
 	public void Help()
 	{
 		Console.WriteLine("Available targets: " + string.Join(", " , TargetNames));
 		Console.WriteLine();
 		Console.WriteLine("Properties:");
+		Console.WriteLine("-----------");
+		Console.WriteLine();
 		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
 			Console.WriteLine(property.PropertyType + " " + property.Name + "{" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + "}");
 		Console.WriteLine();
 		Console.WriteLine("Methods:");
+		Console.WriteLine("--------");
+		Console.WriteLine();
 		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
 			.Where(x => !x.IsSpecialName))
 		DisplayMethod(method);
@@ -71,15 +74,15 @@ public class BuildHelper
 	{
 		var comment = method.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault();
 		if(comment != null)
-			Console.WriteLine(((DisplayAttribute)comment).Description);
-		Console.WriteLine(method.Name+"(" + string.Join(", ", method.GetParameters().Select(p=>p.ParameterType + " " + p.Name)) + ")");
+			Console.WriteLine("* " + ((DisplayAttribute)comment).Description);
+		Console.WriteLine("  " + method.Name+"(" + string.Join(", ", method.GetParameters().Select(p =>p.ParameterType + " " + p.Name)) + ")");
 		Console.WriteLine();
 	}
-	
+
 	static List<string> _arguments;
 	public static List<string> Arguments { get { return _arguments; } }
 
-	[Display(Description="Method to call to get the value of a script argument. If no argument found, the default value is returned.")]
+	[Display(Description = "Method to call to get the value of a script argument. If no argument found, the default value is returned.")]
 	public static string GetArguments(string prefix, string defaultValue)
 	{
 		var argument = Arguments.FirstOrDefault(a =>a.StartsWith(prefix));
@@ -88,7 +91,7 @@ public class BuildHelper
 		return argument.Substring(prefix.Length);
 	}
 
-	[Display(Description="Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex: new MyBuild().RunTarget(Env.ScriptArgs)")]
+	[Display(Description = "Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex: new MyBuild().RunTarget(Env.ScriptArgs)")]
 	public static void RunTarget(Type type, IReadOnlyList<string> scriptArguments = null)
 	{
 		SetScriptArguments(scriptArguments);
@@ -137,14 +140,14 @@ public class BuildHelper
 		}
 	}
 
-	[Display(Description="Method to call to Launch a process.")]
+	[Display(Description = "Method to call to Launch a process.")]
 	public static bool RunTask(string command, string arguments = null, bool continueOnError = false)
 	{
 		string output;
 		return RunTask(out output, command, arguments, continueOnError, true);
 	}
 
-	[Display(Description="Method to call to Launch a process with the console ouput.")]
+	[Display(Description = "Method to call to Launch a process with the console ouput.")]
 	public static bool RunTask(out string output, string command, string arguments = null, bool continueOnError = false, bool displayInLog = false)
 	{
 		StringBuilder outputBuilder = new StringBuilder();
@@ -220,6 +223,7 @@ public class BuildHelper
 		return envVar;
 	}
 
+	[Display(Description="Write a Debug log.")]
 	public static void Debug(string log)
 	{
 		if(DebugEnabled)
