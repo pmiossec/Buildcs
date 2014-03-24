@@ -50,48 +50,7 @@ public class BuildHelper
 
 	public List<string> TargetNames { get { return Targets.Select(m =>m.Name).ToList(); } }
 
-	[Target]
-	[Display(Description = "Default [Target] to display some help.")]
-	public void Help()
-	{
-		Console.WriteLine("Available targets: " + string.Join(", " , TargetNames));
-		Console.WriteLine();
-		Console.WriteLine("Properties:");
-		Console.WriteLine("-----------");
-		Console.WriteLine();
-		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
-			Console.WriteLine(property.PropertyType + " " + property.Name + "{" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + "}");
-		Console.WriteLine();
-		Console.WriteLine("Methods:");
-		Console.WriteLine("--------");
-		Console.WriteLine();
-		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
-			.Where(x => !x.IsSpecialName))
-		DisplayMethod(method);
-	}
-
-	private void DisplayMethod(MethodInfo method)
-	{
-		var comment = method.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault();
-		if(comment != null)
-			Console.WriteLine("* " + ((DisplayAttribute)comment).Description);
-		Console.WriteLine("  " + method.Name+"(" + string.Join(", ", method.GetParameters().Select(p =>p.ParameterType + " " + p.Name)) + ")");
-		Console.WriteLine();
-	}
-
-	static List<string> _arguments;
-	public static List<string> Arguments { get { return _arguments; } }
-
-	[Display(Description = "Method to call to get the value of a script argument. If no argument found, the default value is returned.")]
-	public static string GetArguments(string prefix, string defaultValue)
-	{
-		var argument = Arguments.FirstOrDefault(a =>a.StartsWith(prefix));
-		if(argument == null)
-			return defaultValue;
-		return argument.Substring(prefix.Length);
-	}
-
-	[Display(Description = "Main Method to call to Launch your [Target]. Call it with 'Env.ScriptArgs' as parameter ex: new MyBuild().RunTarget(Env.ScriptArgs)")]
+	[Display(Description = "Main Method that MUST be called to Launch your [Target]. ex: BuildHelper.RunTarget(typeof(MyBuild),Env.ScriptArgs)")]
 	public static void RunTarget(Type type, IReadOnlyList<string> scriptArguments = null)
 	{
 		SetScriptArguments(scriptArguments);
@@ -138,6 +97,47 @@ public class BuildHelper
 				Console.WriteLine("   => Build log file: " + logFile);
 			}
 		}
+	}
+
+	[Target]
+	[Display(Description = "Default [Target] to display some help.")]
+	public void Help()
+	{
+		Console.WriteLine("Available targets: " + string.Join(", " , TargetNames));
+		Console.WriteLine();
+		Console.WriteLine("Properties:");
+		Console.WriteLine("-----------");
+		Console.WriteLine();
+		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
+			Console.WriteLine(property.PropertyType + " " + property.Name + "{" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + "}");
+		Console.WriteLine();
+		Console.WriteLine("Methods:");
+		Console.WriteLine("--------");
+		Console.WriteLine();
+		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+			.Where(x => !x.IsSpecialName))
+		DisplayMethod(method);
+	}
+
+	private void DisplayMethod(MethodInfo method)
+	{
+		var comment = method.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault();
+		if(comment != null)
+			Console.WriteLine("* " + ((DisplayAttribute)comment).Description);
+		Console.WriteLine("  " + method.Name+"(" + string.Join(", ", method.GetParameters().Select(p =>p.ParameterType + " " + p.Name)) + ")");
+		Console.WriteLine();
+	}
+
+	static List<string> _arguments;
+	public static List<string> Arguments { get { return _arguments; } }
+
+	[Display(Description = "Method to call to get the value of a script argument. If no argument found, the default value is returned.")]
+	public static string GetArguments(string prefix, string defaultValue)
+	{
+		var argument = Arguments.FirstOrDefault(a =>a.StartsWith(prefix));
+		if(argument == null)
+			return defaultValue;
+		return argument.Substring(prefix.Length);
 	}
 
 	[Display(Description = "Method to call to Launch a process.")]
@@ -189,11 +189,12 @@ public class BuildHelper
 		return false;
 	}
 
-	[Display(Description="Method to call to pause the process when debugging and waiting for user action to restart.")]
-	public static void PauseAndWaitForUser()
+	[Display(Description="Method to call to get the value of an environnement variable.")]
+	public static string GetEnvironnementVariable(string variable)
 	{
-		Console.WriteLine("Build process paused... (Press 'enter' to continue)");
-		Console.ReadLine();
+		var envVar = Environment.GetEnvironmentVariable(variable);
+		Debug(string.Format("[ENV_VAR]{0}={1}", variable, envVar));
+		return envVar;
 	}
 
 	[Display(Description="Method to call to display a string in the console and the log file.")]
@@ -208,14 +209,6 @@ public class BuildHelper
 	{
 		if(LogEnabled)
 			File.AppendAllText(logFile, log);
-	}
-
-	[Display(Description="Method to call to get the value of an environnement variable.")]
-	public static string GetEnvironnementVariable(string variable)
-	{
-		var envVar = Environment.GetEnvironmentVariable(variable);
-		Debug(string.Format("[ENV_VAR]{0}={1}", variable, envVar));
-		return envVar;
 	}
 
 	[Display(Description="Write a Debug log.")]
@@ -239,6 +232,13 @@ public class BuildHelper
 		action();
 		st.Stop();
 		DisplayAndLog("Duration:" + st.Elapsed.ToString("mm\\:ss\\.ff"));
+	}
+
+	[Display(Description="Method to call to pause the process when debugging and waiting for user action to restart.")]
+	public static void PauseAndWaitForUser()
+	{
+		Console.WriteLine("Build process paused... (Press 'enter' to continue)");
+		Console.ReadLine();
 	}
 }
 
