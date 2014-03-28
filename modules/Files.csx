@@ -40,6 +40,15 @@ public class Files
 		}
 	}
 
+	//Copy a file
+    public static void CopyFile(string sourceName, string destName, bool overwrite = true)
+	{
+		if(!System.IO.File.Exists(sourceName))
+			return;
+
+		File.Copy(sourceName, destName, overwrite);
+	}
+
 	//Delete a file
 	public static void DeleteFile(string filePath)
 	{
