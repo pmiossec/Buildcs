@@ -11,17 +11,17 @@ public class BuildHelper
 {
 	[Display(Description = "Enable/Disable debug logging.")]
 	public static bool DebugEnabled { get; set; }
-	
+
 	[Display(Description = "String representative of the date 'Now'.")]
 	public static string Now { get { return DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"); } }
-	
+
 	private static string logFile = "build_log_" + Now + ".txt";
 	[Display(Description = "Path of the build log file.")]
 	public static string LogFile { get { return Path.Combine(LogPath?? string.Empty, logFile); } }
-	
+
 	[Display(Description = "Enable/Disable logging.")]
 	public static bool LogDisabled { get; set; }
-	
+
 	[Display(Description = "Path of the log file. Set MUST be done before RunTarget() call!")]
 	public static string LogPath { get; set; }
 
@@ -116,10 +116,10 @@ public class BuildHelper
 	[Display(Description = "Default [Target] to display some help.")]
 	public void Help()
 	{
-		Console.WriteLine("Available targets: " + string.Join(", " , TargetNames));
+		DisplayLine("Available targets: " + string.Join(", " , TargetNames), DisplayLevel.Debug);
 		Console.WriteLine();
-		Console.WriteLine("Properties:");
-		Console.WriteLine("-----------");
+		DisplayLine("Properties:", DisplayLevel.Warning);
+		DisplayLine("-----------");
 		Console.WriteLine();
 		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
 		{
@@ -127,9 +127,10 @@ public class BuildHelper
 			Console.WriteLine("  " + property.PropertyType + " " + property.Name + " {" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + " }");
 			Console.WriteLine();
 		}
+
 		Console.WriteLine();
-		Console.WriteLine("Methods:");
-		Console.WriteLine("--------");
+		DisplayLine("Methods:", DisplayLevel.Warning);
+		DisplayLine("--------", DisplayLevel.Warning);
 		Console.WriteLine();
 		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
 			.Where(x => !x.IsSpecialName))
@@ -140,8 +141,9 @@ public class BuildHelper
 	{
 		var comment = method.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault();
 		if(comment != null)
-			Console.WriteLine("* " + ((DisplayAttribute)comment).Description);
+			DisplayLine("* " + ((DisplayAttribute)comment).Description, DisplayLevel.Success);
 	}
+
 	private void DisplayMethod(MethodInfo method)
 	{
 		DisplayComment(method);
@@ -186,7 +188,7 @@ public class BuildHelper
 			if(displayInLog)
 				Log(e.Data + "\n");
 		});
-		
+
 		Time(() => {
 			process.Start();
 			process.BeginOutputReadLine();
@@ -204,14 +206,15 @@ public class BuildHelper
 		if(process.ExitCode == 0)
 		{
 			if(displayInLog)
-				DisplayAndLog("Process run successfully!");
+				DisplayAndLog("Process run successfully!", DisplayLevel.Success);
 			return true;
 		}
-		DisplayAndLog("Process exited with an error :(");
+
+		DisplayAndLog("Process exited with an error :(", DisplayLevel.Error);
 		return false;
 	}
 
-	[Display(Description="Method to call to get the value of an environnement variable.")]
+	[Display(Description = "Method to call to get the value of an environnement variable.")]
 	public static string GetEnvironnementVariable(string variable)
 	{
 		var envVar = Environment.GetEnvironmentVariable(variable);
@@ -219,13 +222,46 @@ public class BuildHelper
 		return envVar;
 	}
 
-	[Display(Description="Method to call to display a string in the console and the log file.")]
-	public static void DisplayAndLog(string log)
+	[Display(Description = "Method to call to display a string in the console and the log file.")]
+	public static void DisplayAndLog(string log, DisplayLevel displayLevel = DisplayLevel.Info)
 	{
-		Console.WriteLine(log);
+		DisplayLine(log);
 		Log(Now + ":" + log+"\n");
 	}
 
+	public enum DisplayLevel
+	{
+		Info,
+		Debug,
+		Warning,
+		Error,
+		Success
+	}
+
+	public static void DisplayLine(string text, DisplayLevel displayLevel = DisplayLevel.Info)
+	{
+		switch(displayLevel)
+		{
+			case DisplayLevel.Info :
+				Console.ForegroundColor = ConsoleColor.White;
+			break;
+			case DisplayLevel.Debug :
+				Console.ForegroundColor = ConsoleColor.Blue;
+			break;
+			case DisplayLevel.Warning :
+				Console.ForegroundColor = ConsoleColor.Yellow;
+			break;
+			case DisplayLevel.Error :
+				Console.ForegroundColor = ConsoleColor.Red;
+			break;
+			case DisplayLevel.Success :
+				Console.ForegroundColor = ConsoleColor.Green;
+			break;
+		}
+		Console.WriteLine(text);
+		Console.ResetColor();
+	}
+	
 	[Display(Description="Method to call to write a string in the log.")]
 	public static void Log(string log)
 	{
