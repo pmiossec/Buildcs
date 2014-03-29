@@ -42,7 +42,6 @@ public class BuildHelper
 			throw new Exception(string.Format("You should specify only 1 target with option '{0}'!", prefix));
 
 		_arguments = scriptArguments.Where(a =>!a.StartsWith(prefix)).ToList();
-		DisplayAndLog("Arguments:" + (Arguments.Any() ? string.Join("," , Arguments) : "(none)"));
 
 		_areArgumentsInitialized = true;
 	}
@@ -87,27 +86,32 @@ public class BuildHelper
 
 		if (method == null)
 		{
-			DisplayAndLog("Target '" + Target + "' not found!");
-			DisplayAndLog("   => Verify the name of the target or add the attribute [Target] to the method...");
-			Console.WriteLine("      Available targets: " + string.Join(", " , customBuild.TargetNames));
+			DisplayAndLog("Target '" + Target + "' not found!", DisplayLevel.Error);
+			DisplayAndLog("   => Verify the name of the target or add the attribute [Target] to the method...", DisplayLevel.Error);
+			DisplayLine("      Available targets: " + string.Join(", " , customBuild.TargetNames), DisplayLevel.Debug);
 		}
 		else
 		{
 			try
 			{
-				DisplayAndLog("Running target:" + method.Name);
-				Console.WriteLine("   => Build log file: " + LogFile);
-				method.Invoke(customBuild, null);
+				DisplayAndLog("Running target:" + method.Name, DisplayLevel.Success);
+				DisplayAndLog("Arguments:" + (Arguments.Any() ? string.Join("," , Arguments) : "(none)"), DisplayLevel.Debug);
+				DisplayLine("   => Build log file: " + Path.GetFullPath(LogFile), DisplayLevel.Warning);
+				Time(() => {
+					method.Invoke(customBuild, null);
+					Console.WriteLine();
+				}, "Total ");
+				DisplayAndLog("Build status: OK", DisplayLevel.Success);
 			}
 			catch(Exception ex)
 			{
-				DisplayAndLog("Build failed with error:" + ex.InnerException.Message);
+				DisplayAndLog("Build failed with error:" + ex.InnerException.Message, DisplayLevel.Error);
+				DisplayAndLog("Build status: KO", DisplayLevel.Error);
 				System.Environment.Exit(1);
 			}
-
 			finally
 			{
-				Console.WriteLine("   => Build log file: " + LogFile);
+				DisplayLine("   => Build log file: " + Path.GetFullPath(LogFile), DisplayLevel.Warning);
 			}
 		}
 	}
@@ -175,6 +179,7 @@ public class BuildHelper
 	public static bool RunTask(out string output, string command, string arguments = null, bool continueOnError = false, bool displayInLog = false)
 	{
 		StringBuilder outputBuilder = new StringBuilder();
+		DisplayAndLog(string.Empty);
 		DisplayAndLog("Running command:" + command + " " + arguments);
 		var process = new System.Diagnostics.Process();
 		process.StartInfo.FileName = command;
@@ -194,23 +199,23 @@ public class BuildHelper
 			process.BeginOutputReadLine();
 			process.WaitForExit();
 			process.CancelOutputRead();
-		});
+		}, "  =>");
 
 		if(!continueOnError && process.ExitCode != 0)
 		{
 			Console.WriteLine(outputBuilder.ToString().TrimEnd('\n', '\r'));
-			throw new Exception("Process exited with an error! Please consult log file ( " + LogFile + ")...");
+			throw new Exception("  =>Process exited with an error! Please consult log file ( " + LogFile + ")...");
 		}
 
 		output = outputBuilder.ToString().TrimEnd('\n', '\r');
 		if(process.ExitCode == 0)
 		{
 			if(displayInLog)
-				DisplayAndLog("Process run successfully!", DisplayLevel.Success);
+				DisplayAndLog("  =>Process run successfully!", DisplayLevel.Success);
 			return true;
 		}
 
-		DisplayAndLog("Process exited with an error :(", DisplayLevel.Error);
+		DisplayAndLog("  =>Process exited with an error :(", DisplayLevel.Error);
 		return false;
 	}
 
@@ -225,7 +230,7 @@ public class BuildHelper
 	[Display(Description = "Method to call to display a string in the console and the log file.")]
 	public static void DisplayAndLog(string log, DisplayLevel displayLevel = DisplayLevel.Info)
 	{
-		DisplayLine(log);
+		DisplayLine(log, displayLevel);
 		Log(Now + ":" + log+"\n");
 	}
 
@@ -243,7 +248,7 @@ public class BuildHelper
 		switch(displayLevel)
 		{
 			case DisplayLevel.Info :
-				Console.ForegroundColor = ConsoleColor.White;
+				Console.ResetColor();
 			break;
 			case DisplayLevel.Debug :
 				Console.ForegroundColor = ConsoleColor.Blue;
@@ -283,13 +288,13 @@ public class BuildHelper
 	}
 
 	[Display(Description="Method to call to time the duration of a method.")]
-	public static void Time(Action action)
+	public static void Time(Action action, string prefix = null)
 	{
 		Stopwatch st = new Stopwatch();
 		st.Start();
 		action();
 		st.Stop();
-		DisplayAndLog("Duration:" + st.Elapsed.ToString("mm\\:ss\\.ff"));
+		DisplayAndLog(string.Format("{0}Duration:{1}", prefix , st.Elapsed.ToString("mm\\:ss\\.ff")));
 	}
 
 	[Display(Description="Method to call to pause the process when debugging and waiting for user action to restart.")]
