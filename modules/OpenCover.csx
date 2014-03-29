@@ -6,7 +6,7 @@ public static class OpenCover
 	public static bool Run(string assemblyFilter, string target, string targetargs, string coverageReportFile = "coverage_report.trx")
 	{
 		if(Path.GetDirectoryName(target) == string.Empty)
-			BuildHelper.DisplayAndLog("OpenCover=>warning: target parameter MUST be an absolute path toward the test framework executable", BuildHelper.DisplayLevel.Warning);
+			BuildHelper.DisplayAndLog("OpenCover=>warning: target parameter MUST be an absolute path toward the test framework executable", DisplayLevel.Warning);
 		return BuildHelper.RunTask(FullPathExe, BuildHelper.BuildCommand("-register:user", "-filter:" + assemblyFilter, "-target:\"" + target + "\"", "-targetargs:\"" + targetargs + "\"", "-output:" + coverageReportFile), true);
 	}
 

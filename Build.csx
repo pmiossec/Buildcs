@@ -120,22 +120,20 @@ public class BuildHelper
 	[Display(Description = "Default [Target] to display some help.")]
 	public void Help()
 	{
-		DisplayLine("Available targets: " + string.Join(", " , TargetNames), DisplayLevel.Debug);
-		Console.WriteLine();
-		DisplayLine("Properties:", DisplayLevel.Warning);
-		DisplayLine("-----------");
-		Console.WriteLine();
+		DisplayAndLog("Available targets: " + string.Join(", " , TargetNames), DisplayLevel.Debug, false);
+		DisplayAndLog();
+		DisplayAndLog("Properties:", DisplayLevel.Warning, false);
+		DisplayAndLog();
 		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
 		{
 			DisplayComment(property);
-			Console.WriteLine("  " + property.PropertyType + " " + property.Name + " {" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + " }");
-			Console.WriteLine();
+			DisplayAndLog("  " + property.PropertyType + " " + property.Name + " {" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + " }", DisplayLevel.Info , false);
+			DisplayAndLog();
 		}
 
 		Console.WriteLine();
-		DisplayLine("Methods:", DisplayLevel.Warning);
-		DisplayLine("--------", DisplayLevel.Warning);
-		Console.WriteLine();
+		DisplayAndLog("Methods:", DisplayLevel.Warning, false);
+		DisplayAndLog();
 		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
 			.Where(x => !x.IsSpecialName))
 		DisplayMethod(method);
@@ -145,14 +143,14 @@ public class BuildHelper
 	{
 		var comment = method.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault();
 		if(comment != null)
-			DisplayLine("* " + ((DisplayAttribute)comment).Description, DisplayLevel.Success);
+			DisplayAndLog("* " + ((DisplayAttribute)comment).Description, DisplayLevel.Success, false);
 	}
 
 	private void DisplayMethod(MethodInfo method)
 	{
 		DisplayComment(method);
-		Console.WriteLine("  " + method.Name+"(" + string.Join(", ", method.GetParameters().Select(p =>p.ParameterType + " " + p.Name)) + ")");
-		Console.WriteLine();
+		DisplayAndLog("  " + method.Name+"(" + string.Join(", ", method.GetParameters().Select(p =>p.ParameterType + " " + p.Name)) + ")", DisplayLevel.Info, false);
+		DisplayAndLog();
 	}
 
 	static List<string> _arguments;
@@ -228,21 +226,13 @@ public class BuildHelper
 	}
 
 	[Display(Description = "Method to call to display a string in the console and the log file.")]
-	public static void DisplayAndLog(string log, DisplayLevel displayLevel = DisplayLevel.Info)
+	public static void DisplayAndLog(string log = null, DisplayLevel displayLevel = DisplayLevel.Info, bool timeStamp = true)
 	{
 		DisplayLine(log, displayLevel);
-		Log(Now + ":" + log+"\n");
+		Log(((log == null) ? string.Empty : (timeStamp ? (Now + ":") : string.Empty) + log) + "\n");
 	}
 
-	public enum DisplayLevel
-	{
-		Info,
-		Debug,
-		Warning,
-		Error,
-		Success
-	}
-
+	[Display(Description = "Method to call to display a string in the console with color depending enum 'DisplayLevel'.")]
 	public static void DisplayLine(string text, DisplayLevel displayLevel = DisplayLevel.Info)
 	{
 		switch(displayLevel)
@@ -303,6 +293,15 @@ public class BuildHelper
 		Console.WriteLine("Build process paused... (Press 'enter' to continue)");
 		Console.ReadLine();
 	}
+}
+
+public enum DisplayLevel
+{
+	Info,
+	Debug,
+	Warning,
+	Error,
+	Success
 }
 
 public class TargetAttribute : Attribute
