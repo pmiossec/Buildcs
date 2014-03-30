@@ -15,12 +15,12 @@ public static class MsTest
 		}
 	}
 
-	public static bool Run(IEnumerable<string> assemblies, string resultFile = "mstest.trx", string testsettings = null)
+	public static bool Run(IEnumerable<string> assemblies, string resultFile = "TestResults.trx", string testsettings = null)
 	{
 		return BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, resultFile, testsettings));
 	}
 
-	public static string GetParameters(IEnumerable<string> assemblies, string resultFile = "mstest.trx", string testsettings = null)
+	public static string GetParameters(IEnumerable<string> assemblies, string resultFile = "TestResults.trx", string testsettings = null)
 	{
 		string paramAssemblies = string.Empty;
 		foreach(var assembly in assemblies)
