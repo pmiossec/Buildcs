@@ -5,16 +5,14 @@ public static class Git
 
 	public static string CurrentSha()
 	{
-		string sha1;
-		BuildHelper.RunTask(out sha1, FullPathExe, "rev-parse HEAD", false);
-		return sha1;
+		BuildHelper.RunTask(FullPathExe, "rev-parse HEAD", false, false);
+		return BuildHelper.LastTaskOutput;
 	}
 
 	public static string CurrentBranch()
 	{
-		string branch;
-		BuildHelper.RunTask(out branch, FullPathExe, "rev-parse --abbrev-ref HEAD", false);
-		return branch;
+		BuildHelper.RunTask(FullPathExe, "rev-parse --abbrev-ref HEAD", false, false);
+		return BuildHelper.LastTaskOutput;
 	}
 	
 	public static bool Run(string parameters)

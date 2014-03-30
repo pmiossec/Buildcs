@@ -25,6 +25,9 @@ public class BuildHelper
 	[Display(Description = "Path of the log file. Set MUST be done before RunTarget() call!")]
 	public static string LogPath { get; set; }
 
+	[Display(Description = "Get the console output of the last task command run")]
+	public static string LastTaskOutput { get; private set; }
+
 	private static bool _areArgumentsInitialized = false;
 	[Display(Description = "Method used to set script arguments.")]
 	private static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
@@ -167,14 +170,7 @@ public class BuildHelper
 	}
 
 	[Display(Description = "Method to call to Launch a process.")]
-	public static bool RunTask(string command, string arguments = null, bool continueOnError = false)
-	{
-		string output;
-		return RunTask(out output, command, arguments, continueOnError, true);
-	}
-
-	[Display(Description = "Method to call to Launch a process with the console ouput.")]
-	public static bool RunTask(out string output, string command, string arguments = null, bool continueOnError = false, bool displayInLog = false)
+	public static bool RunTask(string command, string arguments = null, bool continueOnError = false, bool displayInLog = true)
 	{
 		StringBuilder outputBuilder = new StringBuilder();
 		DisplayAndLog(string.Empty);
@@ -198,14 +194,15 @@ public class BuildHelper
 			process.WaitForExit();
 			process.CancelOutputRead();
 		}, "  =>");
-
+		
+		LastTaskOutput = outputBuilder.ToString().TrimEnd('\n', '\r');
+		
 		if(!continueOnError && process.ExitCode != 0)
 		{
-			Console.WriteLine(outputBuilder.ToString().TrimEnd('\n', '\r'));
+			Console.WriteLine(LastTaskOutput);
 			throw new Exception("  =>Process exited with an error! Please consult log file ( " + LogFile + ")...");
 		}
 
-		output = outputBuilder.ToString().TrimEnd('\n', '\r');
 		if(process.ExitCode == 0)
 		{
 			if(displayInLog)

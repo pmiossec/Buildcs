@@ -8,22 +8,24 @@ public static class VsTest
 
 	public static bool Run(IEnumerable<string> assemblies, string testsettings = null)
 	{
-		string output;
-		var success = BuildHelper.RunTask(out output, FullPathExe, GetParameters(assemblies, testsettings));
-		ExtractResultFileFromOutput(output);
+		var success = BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, testsettings), false, true);
+		ExtractResultFileFromOutput(BuildHelper.LastTaskOutput);
 		return success;
 	}
 
-	private static void ExtractResultFileFromOutput(string output)
+	public static string ExtractResultFileFromOutput(string output)
 	{
 		var fileRegex = new Regex(@"^Results File:(?<file>.*)$", RegexOptions.Multiline);
 		var result = fileRegex.Match(output);
 		if (result.Success)
 		{
 			ResultFile = result.Groups["file"].Value.Trim();
+			BuildHelper.DisplayAndLog("Found test result file:" + ResultFile);
+			return ResultFile;
 		}
+		return null;
 	}
-	
+
 	public static string GetParameters(IEnumerable<string> assemblies, string testsettings = null)
 	{
 		return string.Join(" ", assemblies) + " " + BuildHelper.BuildCommand("/logger:trx");
@@ -31,9 +33,8 @@ public static class VsTest
 
 	public static bool Run(string parameters)
 	{
-		string output;
-		var success = BuildHelper.RunTask(out output, FullPathExe, parameters);
-		ExtractResultFileFromOutput(output);
+		var success = BuildHelper.RunTask(FullPathExe, parameters, false, true);
+		ExtractResultFileFromOutput(BuildHelper.LastTaskOutput);
 		return success;
 	}
 }
