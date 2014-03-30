@@ -1,6 +1,9 @@
 #load Files.csx;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.Coverage.Analysis;
 
+//https://reportgenerator.codeplex.com/wikipage?title=Visual%20Studio%20Coverage%20Tools
+//#r Microsoft.VisualStudio.Coverage.Analysis.dll
 public static class VsTest
 {
 	private static string defaultVsPath = @"..\IDE\CommonExtensions\Microsoft\TestWindow\";
@@ -17,10 +20,11 @@ public static class VsTest
 	}
 	public static string ResultFile { get; private set; }
 
-	public static bool Run(IEnumerable<string> assemblies, string testsettings = null)
+	public static bool Run(IEnumerable<string> assemblies, string testsettings = null, bool enableCodeCoverage = false)
 	{
-		var success = BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, testsettings), false, true);
+		var success = BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, testsettings, enableCodeCoverage), false, true);
 		ExtractResultFileFromOutput(BuildHelper.LastTaskOutput);
+		ConvertCoverageFile(@"D:\Data\Taliance\GlobalFund\TestResults\philippe.miossec_PAR-LAP-1161 2014-03-30 00_54_01\In\PAR-LAP-1161\philippe.miossec_PAR-LAP-1161 2014-03-30 00_53_51.coverage");
 		return success;
 	}
 
@@ -37,9 +41,9 @@ public static class VsTest
 		return null;
 	}
 
-	public static string GetParameters(IEnumerable<string> assemblies, string testsettings = null)
+	public static string GetParameters(IEnumerable<string> assemblies, string testsettings = null, bool enableCodeCoverage = false)
 	{
-		return string.Join(" ", assemblies) + " " + BuildHelper.BuildCommand("/logger:trx");
+		return string.Join(" ", assemblies) + " " + BuildHelper.BuildCommand("/logger:trx") + (enableCodeCoverage? " /EnableCodeCoverage" : string.Empty);
 	}
 
 	public static bool Run(string parameters)
