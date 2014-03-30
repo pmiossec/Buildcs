@@ -112,6 +112,7 @@ public class BuildHelper
 				DisplayAndLog("Build status: KO", DisplayLevel.Error);
 				System.Environment.Exit(1);
 			}
+
 			finally
 			{
 				DisplayLine("   => Build log file: " + Path.GetFullPath(LogFile), DisplayLevel.Warning);
@@ -152,7 +153,17 @@ public class BuildHelper
 	private void DisplayMethod(MethodInfo method)
 	{
 		DisplayComment(method);
-		DisplayAndLog("  " + method.Name+"(" + string.Join(", ", method.GetParameters().Select(p =>p.ParameterType + " " + p.Name)) + ")", DisplayLevel.Info, false);
+		var parameters = string.Join(", ", method.GetParameters().Select(p => {
+				string defaultParam = string.Empty;
+				if(p.IsOptional)
+				{
+					string defaultValue = string.Empty + p.DefaultValue;
+					defaultParam = " = " + (string.IsNullOrEmpty(defaultValue) ? "null" : defaultValue);
+				}
+				return p.ParameterType + " " + p.Name + defaultParam;
+			}
+			));
+		DisplayAndLog("  " + method.Name+"(" + parameters + ")", DisplayLevel.Info, false);
 		DisplayAndLog();
 	}
 
