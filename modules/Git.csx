@@ -14,6 +14,11 @@ public static class Git
 		BuildHelper.RunTask(FullPathExe, "rev-parse --abbrev-ref HEAD", false, false);
 		return BuildHelper.LastTaskOutput;
 	}
+
+	public static void Tag(string tag)
+	{
+		BuildHelper.RunTask(FullPathExe, "tag", tag);
+	}
 	
 	public static bool Run(string parameters)
 	{
