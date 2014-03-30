@@ -1,7 +1,19 @@
 public static class MsTest
 {
+	private static string defaultVsPath = @"..\IDE\";
 	public static string PathToExe { get; set; }
-	public static string FullPathExe { get { return Path.Combine(PathToExe ?? string.Empty, "MSTest.exe"); } }
+	public static string FullPathExe
+	{
+		get
+		{
+			return Files.LookForFileInFolders("MSTest.exe",
+				BuildHelper.GetEnvironnementVariable("VS120COMNTOOLS") + defaultVsPath,
+				BuildHelper.GetEnvironnementVariable("VS110COMNTOOLS") + defaultVsPath,
+				BuildHelper.GetEnvironnementVariable("VS100COMNTOOLS") + defaultVsPath,
+				BuildHelper.GetEnvironnementVariable("VS90COMNTOOLS") + defaultVsPath,
+				PathToExe ?? string.Empty);
+		}
+	}
 
 	public static bool Run(IEnumerable<string> assemblies, string resultFile = "mstest.trx", string testsettings = null)
 	{

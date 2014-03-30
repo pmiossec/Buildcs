@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 public class Files
 {
 	//Copy folder content to another folder
-    public static void CopyFolder(string sourceDirName, string destDirName, bool copySubDirs = true, bool overwrite = false)
+	public static void CopyFolder(string sourceDirName, string destDirName, bool copySubDirs = true, bool overwrite = false)
 	{
 		BuildHelper.DisplayAndLog("Copying directory '" + sourceDirName + "' to '" + destDirName + "'...");
 		// Get the subdirectories for the specified directory.
-        DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+		DirectoryInfo dir = new DirectoryInfo(sourceDirName);
 		DirectoryInfo[] dirs = dir.GetDirectories();
 
 		if (!dir.Exists)
@@ -30,7 +30,7 @@ public class Files
 		}
 
 		// If copying subdirectories, copy them and their contents to new location. 
-        if (copySubDirs)
+		if (copySubDirs)
 		{
 			foreach (DirectoryInfo subdir in dirs)
 			{
@@ -41,7 +41,7 @@ public class Files
 	}
 
 	//Copy a file
-    public static void CopyFile(string sourceName, string destName, bool overwrite = true)
+	public static void CopyFile(string sourceName, string destName, bool overwrite = true)
 	{
 		if(!System.IO.File.Exists(sourceName))
 			return;
@@ -103,7 +103,19 @@ public class Files
 		if(!System.IO.File.Exists(filePath))
 			return;
 
-		BuildHelper.DisplayAndLog("Replacing text in file '" +  filePath + "'...");
+		BuildHelper.DisplayAndLog("Replacing text in file '" + filePath + "'...");
 		File.WriteAllText(filePath, Regex.Replace(File.ReadAllText(filePath), regex, newText));
+	}
+
+	//Look for a file in different folders and return the full path where it is found
+	public static string LookForFileInFolders(string filename, params string[] folders)
+	{
+		foreach(var folder in folders)
+		{
+			var path = Path.Combine(folder, filename);
+			if(File.Exists(path))
+				return path;
+		}
+		return filename;
 	}
 }

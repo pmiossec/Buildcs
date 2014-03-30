@@ -1,9 +1,20 @@
+#load Files.csx;
 using System.Text.RegularExpressions;
 
 public static class VsTest
 {
+	private static string defaultVsPath = @"..\IDE\CommonExtensions\Microsoft\TestWindow\";
 	public static string PathToExe { get; set; }
-	public static string FullPathExe { get { return Path.Combine(PathToExe ?? string.Empty, "vstest.console.exe"); } }
+	public static string FullPathExe
+	{
+		get
+		{
+			return Files.LookForFileInFolders("vstest.console.exe",
+				BuildHelper.GetEnvironnementVariable("VS120COMNTOOLS") + defaultVsPath,
+				BuildHelper.GetEnvironnementVariable("VS110COMNTOOLS") + defaultVsPath,
+				PathToExe ?? string.Empty);
+		}
+	}
 	public static string ResultFile { get; private set; }
 
 	public static bool Run(IEnumerable<string> assemblies, string testsettings = null)
