@@ -17,7 +17,7 @@ public static class Git
 
 	public static void Tag(string tag)
 	{
-		BuildHelper.RunTask(FullPathExe, "tag", tag);
+		BuildHelper.RunTask(FullPathExe, "tag "+ tag);
 	}
 	
 	public static bool Run(string parameters)
