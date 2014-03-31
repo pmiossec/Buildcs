@@ -130,7 +130,8 @@ public class BuildHelper
 		DisplayAndLog();
 		foreach(var property in typeof(BuildHelper).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
 		{
-			DisplayComment(property);
+			if(!DisplayComment(property))
+				continue;
 			DisplayAndLog("  " + property.PropertyType + " " + property.Name + " {" + (property.CanRead ? " get;" : string.Empty) + (property.CanWrite ? " set;" : string.Empty) + " }", DisplayLevel.Info , false);
 			DisplayAndLog();
 		}
@@ -138,21 +139,26 @@ public class BuildHelper
 		Console.WriteLine();
 		DisplayAndLog("Methods:", DisplayLevel.Warning, false);
 		DisplayAndLog();
-		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+		foreach(var method in typeof(BuildHelper).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance)
 			.Where(x => !x.IsSpecialName))
 		DisplayMethod(method);
 	}
 
-	private void DisplayComment(MemberInfo method)
+	private bool DisplayComment(MemberInfo method)
 	{
 		var comment = method.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault();
 		if(comment != null)
+		{
 			DisplayAndLog("* " + ((DisplayAttribute)comment).Description, DisplayLevel.Success, false);
+			return true;
+		}
+		return false;
 	}
 
 	private void DisplayMethod(MethodInfo method)
 	{
-		DisplayComment(method);
+		if(!DisplayComment(method))
+			return;
 		var parameters = string.Join(", ", method.GetParameters().Select(p => {
 				string defaultParam = string.Empty;
 				if(p.IsOptional)
