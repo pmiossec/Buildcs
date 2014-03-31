@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.VisualStudio.Coverage.Analysis;
 
 namespace VsTestCoverageConverter
@@ -26,6 +27,9 @@ namespace VsTestCoverageConverter
 	{
 		public static void ConvertCoverageFile(string coverageFile, string outputFile = "coverage_report.xml")
 		{
+			if (!File.Exists(coverageFile))
+				throw new Exception("File '" + coverageFile + "' not found!");
+			Console.WriteLine("Converting to file '" + outputFile + "'");
 			using (CoverageInfo info = CoverageInfo.CreateFromFile(coverageFile, new string[] { }, new string[] { }))
 			{
 				CoverageDS data = info.BuildDataSet();
