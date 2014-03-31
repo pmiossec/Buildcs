@@ -105,17 +105,14 @@ public class BuildHelper
 					Console.WriteLine();
 				}, "Total ");
 				DisplayAndLog("Build status: OK", DisplayLevel.Success);
+				DisplayLine("   => Build log file: " + Path.GetFullPath(LogFile), DisplayLevel.Warning);
 			}
 			catch(Exception ex)
 			{
 				DisplayAndLog("error: " + ex.InnerException.Message, DisplayLevel.Error);
 				DisplayAndLog("Build status: KO", DisplayLevel.Error);
-				System.Environment.Exit(1);
-			}
-
-			finally
-			{
 				DisplayLine("   => Build log file: " + Path.GetFullPath(LogFile), DisplayLevel.Warning);
+				System.Environment.Exit(1);
 			}
 		}
 	}
@@ -217,7 +214,7 @@ public class BuildHelper
 		if(!continueOnError && process.ExitCode != 0)
 		{
 			Console.WriteLine(LastTaskOutput);
-			throw new Exception("  =>Process exited with an error! Please consult log file ( " + LogFile + ")...");
+			throw new Exception("  =>Process exited with an error!");
 		}
 
 		if(process.ExitCode == 0)
