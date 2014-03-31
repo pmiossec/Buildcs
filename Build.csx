@@ -108,7 +108,7 @@ public class BuildHelper
 			}
 			catch(Exception ex)
 			{
-				DisplayAndLog("Build failed with error:" + ex.InnerException.Message, DisplayLevel.Error);
+				DisplayAndLog("error: " + ex.InnerException.Message, DisplayLevel.Error);
 				DisplayAndLog("Build status: KO", DisplayLevel.Error);
 				System.Environment.Exit(1);
 			}
