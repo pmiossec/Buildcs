@@ -149,6 +149,7 @@ public class BuildHelper
 			DisplayAndLog("* " + ((DisplayAttribute)comment).Description, DisplayLevel.Success, false);
 			return true;
 		}
+
 		return false;
 	}
 
@@ -157,14 +158,16 @@ public class BuildHelper
 		if(!DisplayComment(method))
 			return;
 		var parameters = string.Join(", ", method.GetParameters().Select(p => {
-				string defaultParam = string.Empty;
-				if(p.IsOptional)
-				{
-					string defaultValue = string.Empty + p.DefaultValue;
-					defaultParam = " = " + (string.IsNullOrEmpty(defaultValue) ? "null" : defaultValue);
-				}
-				return p.ParameterType + " " + p.Name + defaultParam;
+			string defaultParam = string.Empty;
+			if(p.IsOptional)
+			{
+				string defaultValue = string.Empty + p.DefaultValue;
+				defaultParam = " = " + (string.IsNullOrEmpty(defaultValue) ? "null" : defaultValue);
 			}
+
+			return p.ParameterType + " " + p.Name + defaultParam;
+		}
+
 			));
 		DisplayAndLog("  " + method.Name+"(" + parameters + ")", DisplayLevel.Info, false);
 		DisplayAndLog();
@@ -208,9 +211,9 @@ public class BuildHelper
 			process.WaitForExit();
 			process.CancelOutputRead();
 		}, "  =>");
-		
+
 		LastTaskOutput = outputBuilder.ToString().TrimEnd('\n', '\r');
-		
+
 		if(!continueOnError && process.ExitCode != 0)
 		{
 			Console.WriteLine(LastTaskOutput);
@@ -264,31 +267,32 @@ public class BuildHelper
 				Console.ForegroundColor = ConsoleColor.Green;
 			break;
 		}
+
 		Console.WriteLine(text);
 		Console.ResetColor();
 	}
-	
-	[Display(Description="Method to call to write a string in the log.")]
+
+	[Display(Description = "Method to call to write a string in the log.")]
 	public static void Log(string log)
 	{
 		if(!LogDisabled)
 			File.AppendAllText(LogFile, log);
 	}
 
-	[Display(Description="Write a Debug log.")]
+	[Display(Description = "Write a Debug log.")]
 	public static void Debug(string log)
 	{
 		if(DebugEnabled)
 			Log("[DEBUG]" + log);
 	}
 
-	[Display(Description="Method to call to easily build command parameters.")]
+	[Display(Description = "Method to call to easily build command parameters.")]
 	public static string BuildCommand(params string[] parameters)
 	{
 		return string.Join(" ", parameters);
 	}
 
-	[Display(Description="Method to call to time the duration of a method.")]
+	[Display(Description = "Method to call to time the duration of a method.")]
 	public static void Time(Action action, string prefix = null)
 	{
 		Stopwatch st = new Stopwatch();
@@ -298,7 +302,7 @@ public class BuildHelper
 		DisplayAndLog(string.Format("{0}Duration:{1}", prefix , st.Elapsed.ToString("mm\\:ss\\.ff")));
 	}
 
-	[Display(Description="Method to call to pause the process when debugging and waiting for user action to restart.")]
+	[Display(Description = "Method to call to pause the process when debugging and waiting for user action to restart.")]
 	public static void PauseAndWaitForUser()
 	{
 		Console.WriteLine("Build process paused... (Press 'enter' to continue)");
