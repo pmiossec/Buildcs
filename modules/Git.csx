@@ -1,7 +1,10 @@
 public static class Git
 {
 	public static string PathToExe { get; set; }
-	public static string FullPathExe { get { return Path.Combine(PathToExe ?? string.Empty, "git.exe"); } }
+	public static string FullPathExe
+	{
+		get { return Files.LookForFileInFolders("git.exe", @"C:\Program Files (x86)\Git\bin",
+				PathToExe ?? string.Empty); } }
 
 	public static string CurrentSha()
 	{
