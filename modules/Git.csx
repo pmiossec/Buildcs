@@ -1,3 +1,5 @@
+#load Files.csx;
+
 public static class Git
 {
 	public static string PathToExe { get; set; }
@@ -21,6 +23,16 @@ public static class Git
 	public static void Tag(string tag)
 	{
 		BuildHelper.RunTask(FullPathExe, "tag "+ tag);
+	}
+
+	public static void ResetAllModifications()
+	{
+		BuildHelper.RunTask(FullPathExe, "reset --hard");
+	}
+
+	public static void Clean(bool allFiles = false)
+	{
+		BuildHelper.RunTask(FullPathExe, "clean -f" + (allFiles? " -dx" : string.Empty));
 	}
 	
 	public static bool Run(string parameters)
