@@ -2,6 +2,8 @@ using System.Text.RegularExpressions;
 
 public class Files
 {
+	public static bool ContinueOnError { get; set; }
+
 	//Copy folder content to another folder
 	public static void CopyFolder(string sourceDirName, string destDirName, bool copySubDirs = true, bool overwrite = false)
 	{
@@ -12,6 +14,13 @@ public class Files
 
 		if (!dir.Exists)
 		{
+			if(ContinueOnError)
+			{
+				BuildHelper.DisplayAndLog("Source directory does not exist or could not be found: " + sourceDirName, DisplayLevel.Error);
+				BuildHelper.DisplayAndLog("Continue anyway...", DisplayLevel.Warning);
+				return;
+			}
+
 			throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDirName);
 		}
 
@@ -44,19 +53,24 @@ public class Files
 	public static void CopyFile(string sourceName, string destName, bool overwrite = true)
 	{
 		if(!System.IO.File.Exists(sourceName))
+		{
+			BuildHelper.DisplayAndLog("warning: the file to copy '" + sourceName + "' doesn't exist!", DisplayLevel.Warning);
 			return;
+		}
 
-		File.Copy(sourceName, destName, overwrite);
+		BuildHelper.ContinueOrFail(() => { File.Copy(sourceName, destName, overwrite); }, ContinueOnError);
 	}
 
 	//Delete a file
 	public static void DeleteFile(string filePath)
 	{
-		if(System.IO.File.Exists(filePath))
-		{
+		if(!System.IO.File.Exists(filePath))
+			return;
+		BuildHelper.ContinueOrFail(
+			() => {
 			BuildHelper.DisplayAndLog("Deleting file '" + filePath + "'...");
 			System.IO.File.Delete(filePath);
-		}
+		}, ContinueOnError);
 	}
 
 	//Get all the files of a directory following a regex patern
@@ -65,7 +79,9 @@ public class Files
 		if(!System.IO.Directory.Exists(parentDirectoryPath))
 			return new string[0];
 
-		return System.IO.Directory.GetFiles(parentDirectoryPath, filePattern, subdirectories ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly);
+		BuildHelper.ContinueOrFail(() => {
+			return System.IO.Directory.GetFiles(parentDirectoryPath, filePattern, subdirectories ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly);
+			}, ContinueOnError);
 	}
 
 	//Delete all the files of a directory following a regex patern
@@ -74,8 +90,10 @@ public class Files
 		if(!System.IO.Directory.Exists(parentDirectoryPath))
 			return;
 
-		foreach(var directory in GetFilesWithPattern(parentDirectoryPath, filePattern))
-			DeleteFile(directory);
+		BuildHelper.ContinueOrFail(() => {
+			foreach(var directory in GetFilesWithPattern(parentDirectoryPath, filePattern))
+				DeleteFile(directory);
+			}, ContinueOnError);
 	}
 
 	//Delete all the subdirectories of a directory following a regex patern
@@ -84,18 +102,22 @@ public class Files
 		if(!System.IO.Directory.Exists(parentDirectoryPath))
 			return;
 
-		foreach(var directory in System.IO.Directory.GetDirectories(parentDirectoryPath, directoryPattern))
-			DeleteDirectory(directory);
+		BuildHelper.ContinueOrFail(() => {
+			foreach(var directory in System.IO.Directory.GetDirectories(parentDirectoryPath, directoryPattern))
+				DeleteDirectory(directory);
+			}, ContinueOnError);
 	}
 
 	//Delete a directory
 	public static void DeleteDirectory(string directoryPath)
 	{
-		if(System.IO.Directory.Exists(directoryPath))
-		{
-			BuildHelper.DisplayAndLog("Deleting directory '" + directoryPath + "'...");
+		if(!System.IO.Directory.Exists(directoryPath))
+			return;
+
+		BuildHelper.DisplayAndLog("Deleting directory '" + directoryPath + "'...");
+		BuildHelper.ContinueOrFail(() => {
 			System.IO.Directory.Delete(directoryPath, true);
-		}
+			}, ContinueOnError);
 	}
 
 	public static void ReplaceText(string filePath, string regex, string newText)
@@ -104,7 +126,9 @@ public class Files
 			return;
 
 		BuildHelper.DisplayAndLog("Replacing text in file '" + filePath + "'...");
-		File.WriteAllText(filePath, Regex.Replace(File.ReadAllText(filePath), regex, newText));
+		BuildHelper.ContinueOrFail(() => {
+			File.WriteAllText(filePath, Regex.Replace(File.ReadAllText(filePath), regex, newText));
+			}, ContinueOnError);
 	}
 
 	//Look for a file in different folders and return the full path where it is found

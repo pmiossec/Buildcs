@@ -304,6 +304,24 @@ public class BuildHelper
 		Console.WriteLine("Build process paused... (Press 'enter' to continue)");
 		Console.ReadLine();
 	}
+
+	public static void ContinueOrFail(Action action, bool continueOnError)
+	{
+		try
+		{
+			action();
+		}
+		catch(Exception ex)
+		{
+			if(continueOnError)
+			{
+				BuildHelper.DisplayAndLog("error: " + ex.Message, DisplayLevel.Error);
+				BuildHelper.DisplayAndLog("Continue anyway...", DisplayLevel.Warning);
+				return;
+			}
+			throw;
+		}
+	}
 }
 
 public enum DisplayLevel
