@@ -309,11 +309,11 @@ public class BuildHelper
 		Console.ReadLine();
 	}
 
-	public static void ContinueOrFail(Action action, bool continueOnError)
+	public static T ContinueOrFail<T>(Func<T> action, bool continueOnError)
 	{
 		try
 		{
-			action();
+			return action();
 		}
 		catch(Exception ex)
 		{
@@ -321,10 +321,15 @@ public class BuildHelper
 			{
 				BuildHelper.DisplayAndLog("error: " + ex.Message, DisplayLevel.Error);
 				BuildHelper.DisplayAndLog("Continue anyway...", DisplayLevel.Warning);
-				return;
+				return default(T);
 			}
 			throw;
 		}
+	}
+
+	public static void ContinueOrFail(Action action, bool continueOnError)
+	{
+		ContinueOrFail(()=>{ action(); return true;}, continueOnError);
 	}
 }
 

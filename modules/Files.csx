@@ -79,9 +79,9 @@ public class Files
 		if(!System.IO.Directory.Exists(parentDirectoryPath))
 			return new string[0];
 
-		BuildHelper.ContinueOrFail(() => {
+		return BuildHelper.ContinueOrFail(() => {
 			return System.IO.Directory.GetFiles(parentDirectoryPath, filePattern, subdirectories ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly);
-			}, ContinueOnError);
+		}, ContinueOnError);
 	}
 
 	//Delete all the files of a directory following a regex patern
