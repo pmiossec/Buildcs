@@ -29,7 +29,10 @@ public class BuildHelper
 	public static string LastTaskOutput { get; private set; }
 
 	[Display(Description = "Set if the script should continue when an error is encountered or a command exit with an error code.")]
-	publi static bool ContinueOnError { get; set; }
+	public static bool ContinueOnError { get; set; }
+
+	[Display(Description = "Display all the log of the run commands in the console output.")]
+	public static bool LogCommandsOnConsole { get; set; }
 
 	private static bool _areArgumentsInitialized = false;
 	[Display(Description = "Method used to set script arguments.")]
@@ -103,6 +106,9 @@ public class BuildHelper
 				DisplayAndLog("Running target:" + method.Name, DisplayLevel.Success);
 				DisplayAndLog("Arguments:" + (Arguments.Any() ? string.Join("," , Arguments) : "(none)"), DisplayLevel.Debug);
 				DisplayLine("   => Build log file: " + Path.GetFullPath(LogFile), DisplayLevel.Warning);
+				
+				LogCommandsOnConsole = bool.Parse(BuildHelper.GetArguments("/verbose:", "False"));
+				
 				Time(() => {
 					method.Invoke(customBuild, null);
 					Console.WriteLine();
@@ -206,6 +212,8 @@ public class BuildHelper
 			outputBuilder.AppendLine(e.Data);
 			if(displayInLog)
 				Log(e.Data + "\n");
+			if(LogCommandsOnConsole)
+				Console.WriteLine(e.Data);
 		});
 
 		Time(() => {
