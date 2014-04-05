@@ -15,9 +15,11 @@ public class BuildHelper
 	[Display(Description = "String representative of the date 'Now'.")]
 	public static string Now { get { return DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"); } }
 
-	private static string logFile = "build_log_" + Now + ".txt";
+	[Display(Description = "Name of the log file.")]
+	public static string LogFileName = "build_log_" + Now + ".txt";
+
 	[Display(Description = "Path of the build log file.")]
-	public static string LogFile { get { return Path.Combine(LogPath?? string.Empty, logFile); } }
+	public static string LogFile { get { return Path.Combine(LogPath?? string.Empty, LogFileName); } }
 
 	[Display(Description = "Enable/Disable logging.")]
 	public static bool LogDisabled { get; set; }
