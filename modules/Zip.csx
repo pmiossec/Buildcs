@@ -8,10 +8,12 @@ public class Zip
 	public static void ZipFilesInArchive(string zipname, params string[] filePaths)
 	{
 		DisplayAndLog("Creation of the zip file '" + zipname + "'...");
-		using (ZipArchive newFile = ZipFile.Open(zipName, ZipArchiveMode.Create))
-		{
-			foreach(var file in filePaths)
-				newFile.CreateEntryFromFile(file, System.IO.Path.GetFileName(file));
-		}
+		BuildHelper.ContinueOrFail(() => {
+			using (ZipArchive newFile = ZipFile.Open(zipName, ZipArchiveMode.Create))
+			{
+				foreach(var file in filePaths)
+					newFile.CreateEntryFromFile(file, System.IO.Path.GetFileName(file));
+			}
+		});
 	}
 }
