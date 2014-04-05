@@ -21,7 +21,7 @@ public static class VsTest
 
 	public static bool Run(IEnumerable<string> assemblies, string testsettings = null, bool enableCodeCoverage = false)
 	{
-		var success = BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, testsettings, enableCodeCoverage), false, true);
+		var success = BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, testsettings, enableCodeCoverage), true);
 		ExtractResultFileFromOutput(BuildHelper.LastTaskOutput);
 		if(enableCodeCoverage)
 			ExtractCoverResultFileFromOutput(BuildHelper.LastTaskOutput);
@@ -63,7 +63,7 @@ public static class VsTest
 
 	public static bool Run(string parameters)
 	{
-		var success = BuildHelper.RunTask(FullPathExe, parameters, false, true);
+		var success = BuildHelper.RunTask(FullPathExe, parameters, true);
 		ExtractResultFileFromOutput(BuildHelper.LastTaskOutput);
 		return success;
 	}

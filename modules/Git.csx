@@ -10,13 +10,13 @@ public static class Git
 
 	public static string CurrentSha()
 	{
-		BuildHelper.RunTask(FullPathExe, "rev-parse HEAD", false, false);
+		BuildHelper.RunTask(FullPathExe, "rev-parse HEAD", false);
 		return BuildHelper.LastTaskOutput;
 	}
 
 	public static string CurrentBranch()
 	{
-		BuildHelper.RunTask(FullPathExe, "rev-parse --abbrev-ref HEAD", false, false);
+		BuildHelper.RunTask(FullPathExe, "rev-parse --abbrev-ref HEAD", false);
 		return BuildHelper.LastTaskOutput;
 	}
 

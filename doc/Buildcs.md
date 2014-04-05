@@ -59,10 +59,15 @@ Note: the only prefix used is `/t:` to specify the target. The other arguments p
 
 * Launch a process
 
-		var success = RunTask("commande.exe", "arguments", false);
+		var success = RunTask("commande.exe", "arguments");
 
-Note: The 3rd parameter tell if the build should continue if an error occurs
-(the command return an exit code different of 0)
+* Continue script even if an error occured
+
+If you want that your script continue to run even if an error occured
+or if a command return an exit code different of 0
+(for exemple when running an analysis tool) , you could set the flag:
+
+		BuildHelper.ContinueOnError = true;
 
 * Write in the Log file
 

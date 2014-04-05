@@ -28,6 +28,9 @@ public class BuildHelper
 	[Display(Description = "Get the console output of the last task command run")]
 	public static string LastTaskOutput { get; private set; }
 
+	[Display(Description = "Set if the script should continue when an error is encountered or a command exit with an error code.")]
+	publi static bool ContinueOnError { get; set; }
+
 	private static bool _areArgumentsInitialized = false;
 	[Display(Description = "Method used to set script arguments.")]
 	private static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
@@ -187,7 +190,7 @@ public class BuildHelper
 	}
 
 	[Display(Description = "Method to call to Launch a process.")]
-	public static bool RunTask(string command, string arguments = null, bool continueOnError = false, bool displayInLog = true)
+	public static bool RunTask(string command, string arguments = null, bool displayInLog = true)
 	{
 		StringBuilder outputBuilder = new StringBuilder();
 		DisplayAndLog(string.Empty);
@@ -214,7 +217,7 @@ public class BuildHelper
 
 		LastTaskOutput = outputBuilder.ToString().TrimEnd('\n', '\r');
 
-		if(!continueOnError && process.ExitCode != 0)
+		if(!ContinueOnError && process.ExitCode != 0)
 		{
 			Console.WriteLine(LastTaskOutput);
 			throw new Exception("  =>Process exited with an error!");
@@ -309,7 +312,7 @@ public class BuildHelper
 		Console.ReadLine();
 	}
 
-	public static T ContinueOrFail<T>(Func<T> action, bool continueOnError)
+	public static T ContinueOrFail<T>(Func<T> action)
 	{
 		try
 		{
@@ -317,7 +320,7 @@ public class BuildHelper
 		}
 		catch(Exception ex)
 		{
-			if(continueOnError)
+			if(ContinueOnError)
 			{
 				BuildHelper.DisplayAndLog("error: " + ex.Message, DisplayLevel.Error);
 				BuildHelper.DisplayAndLog("Continue anyway...", DisplayLevel.Warning);
@@ -327,9 +330,9 @@ public class BuildHelper
 		}
 	}
 
-	public static void ContinueOrFail(Action action, bool continueOnError)
+	public static void ContinueOrFail(Action action)
 	{
-		ContinueOrFail(()=>{ action(); return true;}, continueOnError);
+		ContinueOrFail(()=>{ action(); return true;});
 	}
 }
 

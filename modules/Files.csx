@@ -2,8 +2,6 @@ using System.Text.RegularExpressions;
 
 public class Files
 {
-	public static bool ContinueOnError { get; set; }
-
 	//Copy folder content to another folder
 	public static void CopyFolder(string sourceDirName, string destDirName, bool copySubDirs = true, bool overwrite = false)
 	{
@@ -14,7 +12,7 @@ public class Files
 
 		if (!dir.Exists)
 		{
-			if(ContinueOnError)
+			if(BuildHelper.ContinueOnError)
 			{
 				BuildHelper.DisplayAndLog("Source directory does not exist or could not be found: " + sourceDirName, DisplayLevel.Error);
 				BuildHelper.DisplayAndLog("Continue anyway...", DisplayLevel.Warning);
@@ -58,7 +56,7 @@ public class Files
 			return;
 		}
 
-		BuildHelper.ContinueOrFail(() => { File.Copy(sourceName, destName, overwrite); }, ContinueOnError);
+		BuildHelper.ContinueOrFail(() => { File.Copy(sourceName, destName, overwrite); });
 	}
 
 	//Delete a file
@@ -70,7 +68,7 @@ public class Files
 			() => {
 			BuildHelper.DisplayAndLog("Deleting file '" + filePath + "'...");
 			System.IO.File.Delete(filePath);
-		}, ContinueOnError);
+		});
 	}
 
 	//Get all the files of a directory following a regex patern
@@ -81,7 +79,7 @@ public class Files
 
 		return BuildHelper.ContinueOrFail(() => {
 			return System.IO.Directory.GetFiles(parentDirectoryPath, filePattern, subdirectories ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly);
-		}, ContinueOnError);
+		});
 	}
 
 	//Delete all the files of a directory following a regex patern
@@ -93,7 +91,7 @@ public class Files
 		BuildHelper.ContinueOrFail(() => {
 			foreach(var directory in GetFilesWithPattern(parentDirectoryPath, filePattern))
 				DeleteFile(directory);
-			}, ContinueOnError);
+			});
 	}
 
 	//Delete all the subdirectories of a directory following a regex patern
@@ -105,7 +103,7 @@ public class Files
 		BuildHelper.ContinueOrFail(() => {
 			foreach(var directory in System.IO.Directory.GetDirectories(parentDirectoryPath, directoryPattern))
 				DeleteDirectory(directory);
-			}, ContinueOnError);
+			});
 	}
 
 	//Delete a directory
@@ -117,7 +115,7 @@ public class Files
 		BuildHelper.DisplayAndLog("Deleting directory '" + directoryPath + "'...");
 		BuildHelper.ContinueOrFail(() => {
 			System.IO.Directory.Delete(directoryPath, true);
-			}, ContinueOnError);
+			});
 	}
 
 	public static void ReplaceText(string filePath, string regex, string newText)
@@ -128,7 +126,7 @@ public class Files
 		BuildHelper.DisplayAndLog("Replacing text in file '" + filePath + "'...");
 		BuildHelper.ContinueOrFail(() => {
 			File.WriteAllText(filePath, Regex.Replace(File.ReadAllText(filePath), regex, newText));
-			}, ContinueOnError);
+			});
 	}
 
 	//Look for a file in different folders and return the full path where it is found
