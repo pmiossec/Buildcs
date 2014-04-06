@@ -3,36 +3,41 @@ using System.Text.RegularExpressions;
 public class Files
 {
 	//Copy folder content to another folder
-	public static void CopyFolder(string sourceDirName, string destDirName, bool copySubDirs = true, bool overwrite = false)
+	public static void CopyFolder(string sourceDir, string destinationDir, bool copySubDirs = true, bool overwrite = false, bool cleanDestinationDirectory = false)
 	{
-		BuildHelper.DisplayAndLog("Copying directory '" + sourceDirName + "' to '" + destDirName + "'...");
+		BuildHelper.DisplayAndLog("Copying directory '" + sourceDir + "' to '" + destinationDir + "'...");
 		// Get the subdirectories for the specified directory.
-		DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+		DirectoryInfo dir = new DirectoryInfo(sourceDir);
 		DirectoryInfo[] dirs = dir.GetDirectories();
 
 		if (!dir.Exists)
 		{
 			if(BuildHelper.ContinueOnError)
 			{
-				BuildHelper.DisplayAndLog("Source directory does not exist or could not be found: " + sourceDirName, DisplayLevel.Error);
+				BuildHelper.DisplayAndLog("Source directory does not exist or could not be found: " + sourceDir, DisplayLevel.Error);
 				BuildHelper.DisplayAndLog("Continue anyway...", DisplayLevel.Warning);
 				return;
 			}
 
-			throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDirName);
+			throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDir);
 		}
 
 		// If the destination directory doesn't exist, create it. 
-        if (!Directory.Exists(destDirName))
+        if (!Directory.Exists(destinationDir))
 		{
-			Directory.CreateDirectory(destDirName);
+			Directory.CreateDirectory(destinationDir);
+		}
+		else
+		{
+			if(cleanDestinationDirectory)
+				CleanDirectory(destinationDir);
 		}
 
 		// Get the files in the directory and copy them to the new location.
         FileInfo[] files = dir.GetFiles();
 		foreach (FileInfo file in files)
 		{
-			string temppath = Path.Combine(destDirName, file.Name);
+			string temppath = Path.Combine(destinationDir, file.Name);
 			file.CopyTo(temppath, overwrite);
 		}
 
@@ -41,7 +46,7 @@ public class Files
 		{
 			foreach (DirectoryInfo subdir in dirs)
 			{
-				string temppath = Path.Combine(destDirName, subdir.Name);
+				string temppath = Path.Combine(destinationDir, subdir.Name);
 				CopyFolder(subdir.FullName, temppath, copySubDirs, overwrite);
 			}
 		}
@@ -91,7 +96,7 @@ public class Files
 		BuildHelper.ContinueOrFail(() => {
 			foreach(var directory in GetFilesWithPattern(parentDirectoryPath, filePattern))
 				DeleteFile(directory);
-			});
+		});
 	}
 
 	//Delete all the subdirectories of a directory following a regex patern
@@ -103,7 +108,7 @@ public class Files
 		BuildHelper.ContinueOrFail(() => {
 			foreach(var directory in System.IO.Directory.GetDirectories(parentDirectoryPath, directoryPattern))
 				DeleteDirectory(directory);
-			});
+		});
 	}
 
 	//Delete a directory
@@ -115,9 +120,28 @@ public class Files
 		BuildHelper.DisplayAndLog("Deleting directory '" + directoryPath + "'...");
 		BuildHelper.ContinueOrFail(() => {
 			System.IO.Directory.Delete(directoryPath, true);
+		});
+	}
+
+	//Delete the content of a directory
+	public static void CleanDirectory(string directoryPath)
+	{
+		if(!System.IO.Directory.Exists(directoryPath))
+			return;
+
+		BuildHelper.DisplayAndLog("Deleting directory '" + directoryPath + "'...");
+		BuildHelper.ContinueOrFail(() => {
+			var directoriesToClean = System.IO.Directory.GetDirectories(directoryPath);
+			foreach(var dir in directoriesToClean)
+				System.IO.Directory.Delete(dir, true);
+
+			var filesToClean = System.IO.Directory.GetFiles(directoryPath);
+			foreach(var file in filesToClean)
+				System.IO.File.Delete(file);
 			});
 	}
 
+	//Replace a text following a regular expression in a file by another text
 	public static void ReplaceText(string filePath, string regex, string newText)
 	{
 		if(!System.IO.File.Exists(filePath))
