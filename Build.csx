@@ -1,4 +1,12 @@
 #r System.ComponentModel.DataAnnotations.dll
+#load .\modules\Files.csx
+#load .\modules\MsBuild.csx
+#load .\modules\Git.csx
+#load .\modules\MsTest.csx
+#load .\modules\VsTest.csx
+#load .\modules\OpenCover.csx
+#load .\modules\ProjectFile.csx
+//#load .\modules\Zip.csx
 //Usage:
 //scriptcs.exe build.csx --
 //scriptcs.exe build.csx -- /t:Build /o:other /a:arguments
