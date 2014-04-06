@@ -58,7 +58,10 @@ public static class VsTest
 
 	public static string GetParameters(IEnumerable<string> assemblies, string testsettings = null, bool enableCodeCoverage = false)
 	{
-		return string.Join(" ", assemblies) + " " + BuildHelper.BuildCommand("/logger:trx") + (enableCodeCoverage? " /EnableCodeCoverage" : string.Empty);
+		var assembliesParams = string.Join(" ", assemblies);
+		return BuildHelper.BuildCommand( assembliesParams, "/logger:trx",
+			(enableCodeCoverage ? "/EnableCodeCoverage" : string.Empty),
+			(testsettings == null ? string.Empty : ("/Settings:" + testsettings)));
 	}
 
 	public static bool Run(string parameters)
