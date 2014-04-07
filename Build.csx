@@ -5,6 +5,7 @@
 #load .\modules\MsTest.csx
 #load .\modules\VsTest.csx
 #load .\modules\OpenCover.csx
+#load .\modules\ReportGenerator.csx
 #load .\modules\ProjectFile.csx
 //#load .\modules\Zip.csx
 //Usage:
