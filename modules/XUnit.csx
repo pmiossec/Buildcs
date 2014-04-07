@@ -10,7 +10,7 @@ public static class XUnit
 		}
 	}
 
-	public static bool Run(string assembly, string resultFile = "TestResults.xml")
+	public static Result Run(string assembly, string resultFile = "TestResults.xml")
 	{
 		return BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, resultFile));
 	}
@@ -20,7 +20,7 @@ public static class XUnit
 		return assembly + " /xml "+ resultFile;
 	}
 
-	public static bool Run(string parameters)
+	public static Result Run(string parameters)
 	{
 		return BuildHelper.RunTask(FullPathExe, parameters);
 	}

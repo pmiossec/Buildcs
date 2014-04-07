@@ -19,13 +19,13 @@ public static class VsTest
 	public static string ResultFile { get; private set; }
 	public static string CoverageResultFile { get; private set; }
 
-	public static bool Run(IEnumerable<string> assemblies, string testsettings = null, bool enableCodeCoverage = false)
+	public static Result Run(IEnumerable<string> assemblies, string testsettings = null, bool enableCodeCoverage = false)
 	{
-		var success = BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, testsettings, enableCodeCoverage), true);
-		ExtractResultFileFromOutput(BuildHelper.LastTaskOutput);
+		var result = BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, testsettings, enableCodeCoverage), true);
+		ExtractResultFileFromOutput(result.Output);
 		if(enableCodeCoverage)
-			ExtractCoverResultFileFromOutput(BuildHelper.LastTaskOutput);
-		return success;
+			ExtractCoverResultFileFromOutput(result.Output);
+		return result;
 	}
 
 	public static string ExtractResultFileFromOutput(string output)
@@ -64,10 +64,10 @@ public static class VsTest
 			(testsettings == null ? string.Empty : ("/Settings:" + testsettings)));
 	}
 
-	public static bool Run(string parameters)
+	public static Result Run(string parameters)
 	{
-		var success = BuildHelper.RunTask(FullPathExe, parameters, true);
-		ExtractResultFileFromOutput(BuildHelper.LastTaskOutput);
-		return success;
+		var result = BuildHelper.RunTask(FullPathExe, parameters, true);
+		ExtractResultFileFromOutput(result.Output);
+		return result;
 	}
 }

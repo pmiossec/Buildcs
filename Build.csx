@@ -35,8 +35,8 @@ public class BuildHelper
 	[Display(Description = "Path of the log file. Set MUST be done before RunTarget() call!")]
 	public static string LogPath { get; set; }
 
-	[Display(Description = "Get the console output of the last task command run")]
-	public static string LastTaskOutput { get; private set; }
+	[Display(Description = "Get the result (Success & Output) of the last task command run")]
+	public static Result Result { get; private set; }
 
 	[Display(Description = "Set if the script should continue when an error is encountered or a command exit with an error code.")]
 	public static bool ContinueOnError { get; set; }
@@ -218,7 +218,7 @@ public class BuildHelper
 	}
 
 	[Display(Description = "Method to call to Launch a process.")]
-	public static bool RunTask(string command, string arguments = null, bool displayInLog = true)
+	public static Result RunTask(string command, string arguments = null, bool displayInLog = true)
 	{
 		StringBuilder outputBuilder = new StringBuilder();
 		DisplayAndLog(string.Empty);
@@ -245,23 +245,25 @@ public class BuildHelper
 			process.CancelOutputRead();
 		}, "  =>");
 
-		LastTaskOutput = outputBuilder.ToString().TrimEnd('\n', '\r');
+		Result = new Result { Success = (process.ExitCode == 0), Output = outputBuilder.ToString().TrimEnd('\n', '\r') };
 
-		if(!ContinueOnError && process.ExitCode != 0)
-		{
-			Console.WriteLine(LastTaskOutput);
-			throw new Exception("  =>Process exited with an error!");
-		}
-
-		if(process.ExitCode == 0)
+		if(Result.Success)
 		{
 			if(displayInLog)
 				DisplayAndLog("  =>Process run successfully!", DisplayLevel.Success);
-			return true;
+			return Result;
+		}
+		else
+		{
+			if(!ContinueOnError)
+			{
+				Console.WriteLine(Result.Output);
+				throw new Exception("  =>Process exited with an error!");
+			}
+			DisplayAndLog("  =>Process exited with an error :(", DisplayLevel.Error);
 		}
 
-		DisplayAndLog("  =>Process exited with an error :(", DisplayLevel.Error);
-		return false;
+		return Result;
 	}
 
 	[Display(Description = "Method to call to get the value of an environnement variable.")]
@@ -364,6 +366,12 @@ public class BuildHelper
 	{
 		ContinueOrFail(()=>{ action(); return true;});
 	}
+}
+
+public struct Result
+{
+	public bool Success;
+	public string Output;
 }
 
 public enum DisplayLevel

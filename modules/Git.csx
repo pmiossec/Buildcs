@@ -6,18 +6,18 @@ public static class Git
 	public static string FullPathExe
 	{
 		get { return Files.LookForFileInFolders("git.exe", @"C:\Program Files (x86)\Git\bin",
-				PathToExe ?? string.Empty); } }
+					@"C:\Program Files\Git\bin", PathToExe ?? string.Empty); } }
 
 	public static string CurrentSha()
 	{
-		BuildHelper.RunTask(FullPathExe, "rev-parse HEAD", false);
-		return BuildHelper.LastTaskOutput;
+		var result = BuildHelper.RunTask(FullPathExe, "rev-parse HEAD", false);
+		return result.Success ? result.Output : string.Empty;
 	}
 
 	public static string CurrentBranch()
 	{
-		BuildHelper.RunTask(FullPathExe, "rev-parse --abbrev-ref HEAD", false);
-		return BuildHelper.LastTaskOutput;
+		var result = BuildHelper.RunTask(FullPathExe, "rev-parse --abbrev-ref HEAD", false);
+		return result.Success ? result.Output : string.Empty;
 	}
 
 	public static void Tag(string tag)
@@ -35,7 +35,7 @@ public static class Git
 		BuildHelper.RunTask(FullPathExe, "clean -f" + (allFiles? " -dx" : string.Empty));
 	}
 	
-	public static bool Run(string parameters)
+	public static Result Run(string parameters)
 	{
 		return BuildHelper.RunTask(FullPathExe, parameters);
 	}

@@ -15,7 +15,7 @@ public static class MsTest
 		}
 	}
 
-	public static bool Run(IEnumerable<string> assemblies, string resultFile = "TestResults.trx", string testsettings = null)
+	public static Result Run(IEnumerable<string> assemblies, string resultFile = "TestResults.trx", string testsettings = null)
 	{
 		return BuildHelper.RunTask(FullPathExe, GetParameters(assemblies, resultFile, testsettings));
 	}
@@ -31,7 +31,7 @@ public static class MsTest
 		return BuildHelper.BuildCommand(paramAssemblies, "/resultsfile:"+ resultFile, testsettings == null ? string.Empty : "/testSettings:" + testsettings , "/nologo");
 	}
 
-	public static bool Run(string parameters)
+	public static Result Run(string parameters)
 	{
 		return BuildHelper.RunTask(FullPathExe, parameters);
 	}
