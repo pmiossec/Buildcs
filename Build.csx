@@ -113,6 +113,18 @@ public class BuildHelper
 		{
 			try
 			{
+				if(File.Exists(LogFile))
+				{
+					try
+					{
+						File.Delete(LogFile);
+					}
+					catch(Exception ex)
+					{
+						DisplayLine("Fail to delete log file:" + Path.GetFullPath(LogFile), DisplayLevel.Error);
+					}
+				}
+
 				DisplayAndLog("Running target:" + method.Name, DisplayLevel.Success);
 				DisplayAndLog("Arguments:" + (Arguments.Any() ? string.Join("," , Arguments) : "(none)"), DisplayLevel.Debug);
 				DisplayLine("   => Build log file: " + Path.GetFullPath(LogFile), DisplayLevel.Warning);
