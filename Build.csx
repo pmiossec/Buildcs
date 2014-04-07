@@ -128,9 +128,9 @@ public class BuildHelper
 				DisplayAndLog("Running target:" + method.Name, DisplayLevel.Success);
 				DisplayAndLog("Arguments:" + (Arguments.Any() ? string.Join("," , Arguments) : "(none)"), DisplayLevel.Debug);
 				DisplayLine("   => Build log file: " + Path.GetFullPath(LogFile), DisplayLevel.Warning);
-				
+
 				LogCommandsOnConsole = bool.Parse(BuildHelper.GetArguments("/verbose:", "False"));
-				
+
 				Time(() => {
 					method.Invoke(customBuild, null);
 					Console.WriteLine();
@@ -358,13 +358,14 @@ public class BuildHelper
 				BuildHelper.DisplayAndLog("Continue anyway...", DisplayLevel.Warning);
 				return default(T);
 			}
+
 			throw;
 		}
 	}
 
 	public static void ContinueOrFail(Action action)
 	{
-		ContinueOrFail(()=>{ action(); return true;});
+		ContinueOrFail(() => { action(); return true; });
 	}
 }
 
