@@ -41,7 +41,7 @@ public partial class ReleaseBuild : BuildHelper
 		filesInZip.AddRange(Files.GetFilesWithPattern("tools", "*.*", true));
 		
 		var zipFile = softwareName + "_" + tag + ".zip";
-		ZipLib.ZipFilesInArchive(zipFile, filesInZip.ToArray());
+		Zip.ZipFilesInArchive(zipFile, filesInZip.ToArray());
 		
 		var github = new GitHubWrapper.GitHubWrapper();
 		github.Release(GitHubLogin + "/" + softwareName, GitHubAuthToken, tag, new UploadFile[]{ new UploadFile{ Path = zipFile, ContentType = "application/zip" } });
