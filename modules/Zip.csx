@@ -14,7 +14,10 @@ public partial class Zip
 			using (ZipFile zip = new ZipFile())
 			{
 				foreach(var file in filePaths)
-					zip.AddFile(file);
+				{
+					if(File.Exists(file))
+						zip.AddFile(file);
+				}
 				zip.Save(System.IO.Path.GetFileName(zipname));
 			}
 		});
