@@ -1,7 +1,7 @@
 #load Files.csx;
 using System.Text.RegularExpressions;
 
-public static class VsTest
+public static partial class VsTest
 {
 	private static string defaultVsPath = @"..\IDE\CommonExtensions\Microsoft\TestWindow\";
 	public static string PathToExe { get; set; }

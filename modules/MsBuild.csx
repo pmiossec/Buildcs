@@ -1,4 +1,4 @@
-public static class MsBuild
+public static partial class MsBuild
 {
 	public static string PathToExe { get; set; }
 	public static string FullPathExe { get { return Path.Combine(PathToExe ?? string.Empty, "msbuild.exe"); } }

@@ -1,4 +1,4 @@
-public static class XUnit
+public static partial class XUnit
 {
 	public static string PathToExe { get; set; }
 	public static string FullPathExe

@@ -1,4 +1,4 @@
-public static class ReportGenerator
+public static partial class ReportGenerator
 {
 	public static string PathToExe { get; set; }
 	public static string FullPathExe { get { return Files.LookForFileInFolders("reportgenerator.exe", PathToExe ?? string.Empty); } }

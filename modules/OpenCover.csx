@@ -1,4 +1,4 @@
-public static class OpenCover
+public static partial class OpenCover
 {
 	public static string PathToExe { get; set; }
 	public static string FullPathExe { get { return Files.LookForFileInFolders("OpenCover.Console.exe", PathToExe ?? string.Empty); } }

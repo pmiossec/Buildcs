@@ -1,4 +1,4 @@
-public static class MsTest
+public static partial class MsTest
 {
 	private static string defaultVsPath = @"..\IDE\";
 	public static string PathToExe { get; set; }

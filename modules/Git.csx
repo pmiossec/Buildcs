@@ -1,6 +1,6 @@
 #load Files.csx;
 
-public static class Git
+public static partial class Git
 {
 	public static string PathToExe { get; set; }
 	public static string FullPathExe

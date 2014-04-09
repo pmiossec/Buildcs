@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-public class Files
+public partial class Files
 {
 	//Copy folder content to another folder
 	public static void CopyFolder(string sourceDir, string destinationDir, bool copySubDirs = true, bool overwrite = false, bool cleanDestinationDirectory = false)

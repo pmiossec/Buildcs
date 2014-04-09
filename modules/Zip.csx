@@ -1,8 +1,10 @@
 #r Ionic.Zip.dll
 
 using Ionic.Zip;
+//https://dotnetzip.codeplex.com/ (old version, with binaries)
+//https://github.com/haf/DotNetZip.Semverd (new version but without binaries)
 
-public class ZipLib
+public partial class Zip
 {
 	//Zip some files in a zip file
 	public static void ZipFilesInArchive(string zipname, params string[] filePaths)

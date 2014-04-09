@@ -1,7 +1,7 @@
 #r "Microsoft.Build.dll"
 using System.Xml;
 
-public static class CsProjFile
+public static partial class CsProjFile
 {
 	public static void UpdateApplicationRevision(string projectFilePath, int? newValue = null)
 	{
