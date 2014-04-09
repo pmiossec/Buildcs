@@ -4,40 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Octokit;
 
-namespace OctokitWrapper
+namespace GitHubWrapper
 {
 	/// <summary>
 	/// Create a release on github.com.
 	/// </summary>
-	/// <example>
-	/// <code><![CDATA[
-	/// <ItemGroup>
-	/// <ReleaseFiles Include="MyAwesomeProject-v0.1.0.zip" />
-	/// <ReleaseFiles Include="MyAwesomeReleaseNotes.md">
-	/// <ContentType>text/plain</ContentType>
-	/// </ReleaseFiles>
-	/// </ItemGroup>
-	/// <ItemGroup>
-	/// <ReleaseNotesFile Include="MyAwesomeReleaseNotes.md" />
-	/// </ItemGroup>
-	/// <Target Name="Release">
-	/// <CreateRelease Repository="owner/repo" OauthToken="$(GitHubAuthToken)" TagName="v0.1.0" Files="@(ReleaseFiles)" ReleaseNotesFile="$(ReleaseNotesFile)" />
-	/// </Target>
-	/// ]]></code>
-	/// </example>
-	public class OctokitWrapper
+	public class GitHubWrapper
 	{
-		//Output
 		public string[] UploadedAssets { get; private set; }
 
-		//Output
 		public int IdRelease { get; private set; }
 
-		private string Owner { get { return Repository.Split('/')[0]; } }
+		private string Owner { get { return _repository.Split('/')[0]; } }
 
-		private string RepositoryName { get { return Repository.Split('/')[1]; } }
+		private string RepositoryName { get { return _repository.Split('/')[1]; } }
 
-		private ICredentialStore CredentialStore { get { return new InPlaceCredentialStore(OauthToken); } }
+		private ICredentialStore CredentialStore { get { return new InPlaceCredentialStore(_oauthToken); } }
 
 		class InPlaceCredentialStore : ICredentialStore
 		{
@@ -52,19 +34,22 @@ namespace OctokitWrapper
 				return new Credentials(_token);
 			}
 		}
-		//[Required]
-		public string Repository { get; set; }
 
-		//[Required]
-		public string OauthToken { get; set; }
+		private string _repository;
 
-		//[Required]
-		public string TagName { get; set; }
+		private string _oauthToken;
 
-		public string ReleaseNotesFile { get; set; }
+		private string _tagName;
 
-		public bool Release(UploadFile[] files)
+		private string _releaseNotesFile;
+
+		public bool Release(string repository, string oauthToken, string tagName, UploadFile[] files, string releaseNotesFile)
 		{
+			_repository = repository;
+			_oauthToken = oauthToken;
+			_tagName = tagName;
+			_releaseNotesFile = releaseNotesFile;
+
 			var client = new GitHubClient(new Octokit.ProductHeaderValue("GitTfsTasks"), CredentialStore).Release;
 			var release = client.CreateRelease(Owner, RepositoryName, BuildReleaseData()).Result;
 			IdRelease = release.Id;
@@ -95,10 +80,10 @@ namespace OctokitWrapper
 
 		private ReleaseUpdate BuildReleaseData()
 		{
-			var release = new ReleaseUpdate(TagName);
-			if (ReleaseNotesFile != null)
+			var release = new ReleaseUpdate(_tagName);
+			if (_releaseNotesFile != null)
 			{
-				release.Body = File.ReadAllText(ReleaseNotesFile);
+				release.Body = File.ReadAllText(_releaseNotesFile);
 			}
 
 			return release;
@@ -116,16 +101,12 @@ namespace OctokitWrapper
 
 		private string TaskItemFor(Release release, Task<ReleaseAsset> asset)
 		{
-			string item;
-			// I don't think there's a way, via the API, to get something like this:
-			// https://github.com/git-tfs/msbuild-tasks/releases/download/v0.0.9/GitTfsTasks-0.0.9.zip
-			item = "https://github.com/" + Repository + "/releases/download/" + TagName + "/" + asset.Result.Name;
+			return "https://github.com/" + _repository + "/releases/download/" + _tagName + "/" + asset.Result.Name;
 			//item.MaybeSetMetadata("ContentType", asset.ContentType);
 			//item.MaybeSetMetadata("Id", asset.Id.ToString());
 			//item.MaybeSetMetadata("Label", asset.Label);
 			//item.MaybeSetMetadata("Name", asset.Name);
 			//item.MaybeSetMetadata("State", asset.State);
-			return item;
 		}
 	}
 }
