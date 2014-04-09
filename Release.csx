@@ -2,6 +2,7 @@
 #load Build.csx
 #load Release.perso.csx
 
+using GitHubWrapper;
 //Usage: scriptcs.exe BuildHelper.csx -- /v:1.0
 
 //Need to create a partial class containing your personal datas (that must not been commited!) like that:
