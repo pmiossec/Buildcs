@@ -43,7 +43,7 @@ namespace GitHubWrapper
 
 		private string _releaseNotesFile;
 
-		public bool Release(string repository, string oauthToken, string tagName, UploadFile[] files, string releaseNotesFile)
+		public bool Release(string repository, string oauthToken, string tagName, UploadFile[] files, string releaseNotesFile = null)
 		{
 			_repository = repository;
 			_oauthToken = oauthToken;
