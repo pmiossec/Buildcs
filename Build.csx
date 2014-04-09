@@ -47,7 +47,7 @@ public class BuildHelper
 
 	private static bool _areArgumentsInitialized = false;
 	[Display(Description = "Method used to set script arguments.")]
-	private static void SetScriptArguments(IReadOnlyList<string> scriptArguments)
+	private static void SetScriptArguments(System.Collections.Generic.IReadOnlyList<string> scriptArguments)
 	{
 		if(scriptArguments == null)
 		{
@@ -82,7 +82,7 @@ public class BuildHelper
 	public List<string> TargetNames { get { return Targets.Select(m =>m.Name).ToList(); } }
 
 	[Display(Description = "Main Method that MUST be called to Launch your [Target]. ex: BuildHelper.RunTarget(typeof(MyBuild),Env.ScriptArgs)")]
-	public static void RunTarget(Type type, IReadOnlyList<string> scriptArguments = null)
+	public static void RunTarget(Type type, System.Collections.Generic.IReadOnlyList<string> scriptArguments = null)
 	{
 		SetScriptArguments(scriptArguments);
 
