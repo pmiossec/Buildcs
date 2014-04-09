@@ -4,6 +4,13 @@
 
 //Usage: scriptcs.exe BuildHelper.csx -- /v:1.0
 
+//Need to create a partial class containing your personal datas (that must not been commited!) like that:
+//public partial class ReleaseBuild
+//{
+//	string GitHubAuthToken = "C4BD2DF21A8BAC6FF6537C54B9697402";
+//	string GitHubLogin = "myAccount";
+//}
+
 BuildHelper.RunTarget(typeof(ReleaseBuild), Env.ScriptArgs);
 
 public partial class ReleaseBuild : BuildHelper
