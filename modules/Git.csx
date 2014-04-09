@@ -25,6 +25,12 @@ public static class Git
 		BuildHelper.RunTask(FullPathExe, "tag "+ tag);
 	}
 
+	public static void Push(string repository, params string[] branches)
+	{
+		var refToPush = branches == null ? string.Empty : string.Join(" ", branches);
+		BuildHelper.RunTask(FullPathExe, "push " + repository + " " + refToPush);
+	}
+
 	public static void ResetAllModifications()
 	{
 		BuildHelper.RunTask(FullPathExe, "reset --hard");
