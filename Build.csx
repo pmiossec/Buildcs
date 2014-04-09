@@ -7,7 +7,8 @@
 #load .\modules\OpenCover.csx
 #load .\modules\ReportGenerator.csx
 #load .\modules\ProjectFile.csx
-//#load .\modules\Zip.csx
+#load .\modules\Zip.csx
+
 //Usage:
 //scriptcs.exe build.csx --
 //scriptcs.exe build.csx -- /t:Build /o:other /a:arguments
