@@ -1,6 +1,8 @@
 #load Files.csx;
 using System.Text.RegularExpressions;
 
+//TODO: Gerer /TestAdapterPath:\".\"
+
 public static partial class VsTest
 {
 	private static string defaultVsPath = @"..\IDE\CommonExtensions\Microsoft\TestWindow\";

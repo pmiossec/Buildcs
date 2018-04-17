@@ -61,7 +61,26 @@ public partial class Files
 			return;
 		}
 
+		BuildHelper.DisplayAndLog("Copying file '" + sourceName + "' to '" + destName + "'...");
 		BuildHelper.ContinueOrFail(() => { File.Copy(sourceName, destName, overwrite); });
+	}
+
+	//Move a file
+	public static void MoveFile(string sourceName, string destName, bool overwrite = true)
+	{
+		if(!System.IO.File.Exists(sourceName))
+		{
+			BuildHelper.DisplayAndLog("warning: the file to copy '" + sourceName + "' doesn't exist!", DisplayLevel.Warning);
+			return;
+		}
+
+		BuildHelper.DisplayAndLog("Moving file '" + sourceName + "' to '" + destName + "'...");
+		BuildHelper.ContinueOrFail(() => {
+			if(System.IO.File.Exists(destName) && overwrite)
+				System.IO.File.Delete(destName);
+
+			File.Move(sourceName, destName);
+			});
 	}
 
 	//Delete a file
